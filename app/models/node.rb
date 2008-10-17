@@ -18,6 +18,10 @@ class Node < ActiveRecord::Base
     aoa
   end
   
+  def to_otl_array
+    self.class.otl_to_array(self.to_otl)
+  end
+  
   def to_otl
     otl = self.to_otl_node
     self.children.each {|e| otl += e.to_otl }
@@ -48,8 +52,16 @@ class Node < ActiveRecord::Base
   end
   
   def text_update
+    old_otl_array = self.to_otl_array.dup
     new_otl = edit
-    self.class.update_otl(self.id, new_otl)
+    self.class.transaction do
+      new_otl_array = self.class.otl_to_array(new_otl)
+      new_otl_array.each {|e| old_otl_array.delete(e)}
+      self.class.update_otl(self.id, new_otl)
+      #delete old nodes
+      old_otl_array.each {|e| puts "Deleting node #{e[:id]}"; Node.find(e[:id]).destroy}
+    end
+    self.to_otl
   end
   
   class <<self
@@ -61,15 +73,19 @@ class Node < ActiveRecord::Base
       system("#{ENV['editor'] || 'vim'} #{tempfile.path}")
       File.read(tempfile.path)
     end
-
+    
+    def otl_to_array(otl)
+      otl.split("\n").map {|e| e =~ /^(\t+)?((\d+):)?\s*(.*)$/; {:id=>$3.to_i, :name=>$4, :level=>($1 ? $1.count("\t") : 0) } }
+    end
+    
     #level array is an array of level to value arrays
     def otl_to_level_array(otl)
-      nodes = otl.split("\n").map {|e| e =~ /^(\t+)?((\d+):)?\s*(.*)$/; {:id=>$3.to_i, :name=>$4, :level=>($1 ? $1.count("\t") : 0) } }
+      nodes = otl_to_array(otl)
       nodes.map {|e| [e[:level], e]}
     end
     
     # def otl_to_aoa(otl)
-    #   nodes = otl_to_level_array(otl)
+    #   nodes = otl_to_array(otl)
     #   aoa = []
     #   child_aoa = []
     #   nodes.each_with_index do |e, i|
@@ -89,6 +105,7 @@ class Node < ActiveRecord::Base
       level_array = level_array.map do |level, hash|
         if hash[:id].zero? || hash[:id].blank?
           obj = create(:name=>hash[:name])
+          puts "Created node #{obj.id}"
           [level, {:id=>obj.id, :name=>obj.name}]
         else
           [level, hash]
