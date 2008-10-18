@@ -1,5 +1,17 @@
 require 'g/outline'
 
+module OutlineParser
+  def otl_to_array(otl)
+    otl.split("\n").map {|e| e =~ /^(\t+)?((\d+):)?\s*(.*)$/; {:id=>$3.to_i, :name=>$4, :level=>($1 ? $1.count("\t") : 0) } }
+  end
+  
+  #level array is an array of level to value arrays
+  def otl_to_level_array(otl)
+    nodes = otl_to_array(otl)
+    nodes.map {|e| [e[:level], e]}
+  end  
+end
+
 class Node < ActiveRecord::Base
   belongs_to :objectable, :polymorphic=>true
   acts_as_nested_set
@@ -19,7 +31,7 @@ class Node < ActiveRecord::Base
   end
   
   def to_otl_array
-    self.class.otl_to_array(self.to_otl)
+    otl_to_array(self.to_otl)
   end
   
   def to_otl
@@ -47,24 +59,105 @@ class Node < ActiveRecord::Base
     node
   end
   
-  def edit
-    self.class.edit_string(to_otl)
+  def text_update
+    new_otl = self.class.edit_string(to_otl)
+    update_otl(new_otl)
+    self.to_otl
   end
   
-  def text_update
+  def update_otl(new_otl)
+    # add_array, delete_array, parents_hash = parse_outlines(old_otl, new_otl)
     old_otl_array = self.to_otl_array.dup
-    p old_otl_array
-    new_otl = edit
+    p ["OLD:", old_otl_array]
     self.class.transaction do
-      new_otl_array = self.class.otl_to_array(new_otl)
+      new_otl_array = otl_to_array(new_otl)
       existing_ids = new_otl_array.map {|e| e[:id]}
       delete_otl_array = old_otl_array.select {|e| !existing_ids.include?(e[:id])}
-      p delete_otl_array
-      self.class.update_otl(self.id, new_otl)
-      #delete old nodes
-      delete_otl_array.each {|e| puts "Deleting node #{e[:id]}"; Node.find(e[:id]).destroy}
+      # add_otl_array = new_otl_array.select {|e| ! old}
+      level_array = otl_to_level_array(new_otl)
+      level_array = add_otl_level_array(level_array)
+      p ["NEW:", level_array.map {|e| e[1]}]
+      parents_hash = parents_hash_for_level_array(level_array)
+      p ["PARENTS:", parents_hash]
+      new_root = parents_hash.invert[:root]
+      parents_hash.delete(new_root)
+      root_id = update_otl_root(new_root[:id], root_id)
+      update_otl_node_levels(parents_hash)
+      #update node text
+      #update node order
+      # root = find(root_id)
+      # update_nodes_children_order(root)
+      
+      delete_otl_nodes(delete_otl_array)
     end
-    self.to_otl
+  end
+  
+  def add_otl_level_array(level_array)
+    level_array.map do |level, hash|
+      if hash[:id].zero? || hash[:id].blank?
+        obj = create(:name=>hash[:name])
+        puts "Created node #{obj.id}"
+        [level, {:id=>obj.id, :name=>obj.name}]
+      else
+        [level, hash]
+      end
+    end
+  end
+  
+  def update_otl_root(new_root, old_root)
+    if new_root != old_root
+      self.class.find(new_root).move_to_root
+      puts "Set node #{new_root} as root"
+      new_root
+    else
+      old_root
+    end
+  end
+  
+  def update_otl_node_levels(parents_hash)
+    #update existing nodes to correct parent
+    parents_hash.each do |hash, parent|
+      node = self.class.find(hash[:id])
+      if node.parent_id != parent[:id]
+        node.move_to_child_of(parent[:id]) 
+        puts "Moved node #{node.id} to parent #{parent[:id]}"
+      end
+    end
+  end
+  
+  # def update_node_order_with_children_hash(current_node, children_hash)
+  #   update_node_order_for_level_array
+  #   children = node.children
+  # end
+  # 
+  # def children_hash_for_level_array(level_array)
+  #   level_array.each_with_index do |e, i|
+  #   end
+  # end
+  
+  def parents_hash_for_level_array(level_array)
+    hash = {}
+    parent = :root
+    level_array.each_with_index do |e, i|
+      if i == 0
+        hash[e[1]] = :root
+      else
+        hash[e[1]] = find_parent_in_level_array(level_array, i) or raise "didn't find parent for #{e.inspect}"
+      end
+    end
+    hash
+  end
+  
+  def find_parent_in_level_array(level_array, current_index)
+    possible_parents = level_array.slice(0,current_index).reverse
+    for parent in possible_parents
+      return parent[1] if parent[0] < level_array[current_index][0]
+    end
+    nil
+  end
+  
+  def delete_otl_nodes(delete_otl_array)
+    delete_otl_array.each {|e| puts "Deleting node #{e[:id]}"; self.class.find(e[:id]).destroy}
   end
   
   class <<self
@@ -77,15 +170,10 @@ class Node < ActiveRecord::Base
       File.read(tempfile.path)
     end
     
-    def otl_to_array(otl)
-      otl.split("\n").map {|e| e =~ /^(\t+)?((\d+):)?\s*(.*)$/; {:id=>$3.to_i, :name=>$4, :level=>($1 ? $1.count("\t") : 0) } }
+    def update_otl(root_id, new_otl)
+      find(root_id).update_otl(new_otl)
     end
     
-    #level array is an array of level to value arrays
-    def otl_to_level_array(otl)
-      nodes = otl_to_array(otl)
-      nodes.map {|e| [e[:level], e]}
-    end
     
     # def otl_to_aoa(otl)
     #   nodes = otl_to_array(otl)
@@ -101,74 +189,6 @@ class Node < ActiveRecord::Base
     #   end
     #   aoa
     # end
-    
-    def update_otl(root_id, otl)
-      level_array = otl_to_level_array(otl)
-      #adding new nodes
-      level_array = level_array.map do |level, hash|
-        if hash[:id].zero? || hash[:id].blank?
-          obj = create(:name=>hash[:name])
-          puts "Created node #{obj.id}"
-          [level, {:id=>obj.id, :name=>obj.name}]
-        else
-          [level, hash]
-        end
-      end
-      ids_parents = parents_hash_for_level_array(level_array)
-      p ids_parents
-      #update root
-      new_root = ids_parents.invert[:root]
-      ids_parents.delete(new_root)
-      if new_root[:id] != root_id
-        find(new_root[:id]).move_to_root
-        puts "Set node #{new_root[:id]} as root"
-        root_id = new_root[:id]
-      end
-      #update existing nodes to correct parent
-      ids_parents.each do |hash, parent|
-        node = find(hash[:id]) #|| create(hash[:name])
-        if node.parent_id != parent[:id]
-          node.move_to_child_of(parent[:id]) 
-          puts "Moved node #{node.id} to parent #{parent[:id]}"
-        end
-      end
-      #update node text
-      
-      #update node order
-      # root = find(root_id)
-      # update_nodes_children_order(root)
-    end
-    
-    def update_node_order_with_children_hash(current_node, children_hash)
-      update_node_order_for_level_array
-      children = node.children
-    end
-    
-    def children_hash_for_level_array(level_array)
-      level_array.each_with_index do |e, i|
-      end
-    end
-    
-    def parents_hash_for_level_array(level_array)
-      hash = {}
-      parent = :root
-      level_array.each_with_index do |e, i|
-        if i == 0
-          hash[e[1]] = :root
-        else
-          hash[e[1]] = find_parent_in_level_array(level_array, i) or raise "didn't find parent for #{e.inspect}"
-        end
-      end
-      hash
-    end
-    
-    def find_parent_in_level_array(level_array, current_index)
-      possible_parents = level_array.slice(0,current_index).reverse
-      for parent in possible_parents
-        return parent[1] if parent[0] < level_array[current_index][0]
-      end
-      nil
-    end
     
     def update_ttree(root_id, ttree)
       ids_parents = ids_and_parents_hash(ttree)
