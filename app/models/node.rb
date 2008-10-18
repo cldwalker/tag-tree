@@ -53,13 +53,16 @@ class Node < ActiveRecord::Base
   
   def text_update
     old_otl_array = self.to_otl_array.dup
+    p old_otl_array
     new_otl = edit
     self.class.transaction do
       new_otl_array = self.class.otl_to_array(new_otl)
-      new_otl_array.each {|e| old_otl_array.delete(e)}
+      existing_ids = new_otl_array.map {|e| e[:id]}
+      delete_otl_array = old_otl_array.select {|e| !existing_ids.include?(e[:id])}
+      p delete_otl_array
       self.class.update_otl(self.id, new_otl)
       #delete old nodes
-      old_otl_array.each {|e| puts "Deleting node #{e[:id]}"; Node.find(e[:id]).destroy}
+      delete_otl_array.each {|e| puts "Deleting node #{e[:id]}"; Node.find(e[:id]).destroy}
     end
     self.to_otl
   end
@@ -112,11 +115,13 @@ class Node < ActiveRecord::Base
         end
       end
       ids_parents = parents_hash_for_level_array(level_array)
+      p ids_parents
       #update root
       new_root = ids_parents.invert[:root]
       ids_parents.delete(new_root)
       if new_root[:id] != root_id
         find(new_root[:id]).move_to_root
+        puts "Set node #{new_root[:id]} as root"
         root_id = new_root[:id]
       end
       #update existing nodes to correct parent
@@ -127,8 +132,6 @@ class Node < ActiveRecord::Base
           puts "Moved node #{node.id} to parent #{parent[:id]}"
         end
       end
-      #add/delete nodes
-      
       #update node text
       
       #update node order
