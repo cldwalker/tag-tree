@@ -48,9 +48,12 @@ module OutlineParser
 end
 
 class Node < ActiveRecord::Base
+  include OutlineParser
   belongs_to :objectable, :polymorphic=>true
   acts_as_nested_set
   
+  SEMANTIC_ROOT = 'semantic'
+  TAGS_ROOT = 'tags'
   #currently get [[5, [6, [8]], [7]]]
   #should be [[5, [[6, 8], 7]]]
   def to_aoa
@@ -111,7 +114,7 @@ class Node < ActiveRecord::Base
       parents_hash.delete(new_root)
       root_id = update_otl_root(new_root[:id], self.id)
       update_otl_node_levels(parents_hash)
-      #update node text
+      update_node_attributes(new_otl_array)
       #update node order
       # root = find(root_id)
       # update_nodes_children_order(root)
@@ -129,6 +132,21 @@ class Node < ActiveRecord::Base
       else
         hash
       end
+    end
+  end
+  
+  def update_node_attributes(otl_array)
+    otl_array.each do |e|
+      node = self.class.find(e[:id])
+      if node.name != e[:name]
+        node.update_attribute :name, e[:name]
+        puts "Updated node name for node #{node.id}"
+      end
+      # unless (tag = node.objectable) && tag.name == e[:name]
+      #   node.objectable = Tag.find_or_create_by_name(e[:name])
+      #   node.save
+      #   puts "Synchronizing tag with node #{node.id}"
+      # end
     end
   end
   
@@ -167,7 +185,110 @@ class Node < ActiveRecord::Base
   #   end
   # end
   
+  #nodes with same name
+  def clones
+    unless @clones
+      @clones = self.class.find_all_by_name(self.name)
+      @clones.delete(self)
+    end
+    @clones
+  end
+  
+  def clone_parents; self.clones.map(&:parent); end
+  #returns tree roots
+  def clone_trees; self.clones.map(&:root); end
+  # def tags
+  #   arr = self.clone_parents
+  #   arr << self.parent
+  #   arr.select {|e| e.root.name == TAGS_ROOT}
+  # end
+  
+  def add_tag(tag, context=nil)
+    tag_nodes = self.class.tag_tree.find_descendants(tag).select {|e|
+      e.parent?
+    }
+    if tag_nodes.size == 0
+      tag_node = self.class.create(:name=>tag)
+      tag_node.move_to_child_of self.class.tag_tree.root.id
+      tag_node.reload
+      tag_nodes << tag_node
+      puts "Created tag '#{tag}' in tag tree"
+    end
+    if tag_nodes.size == 1
+      child_node = self.class.create(:name=>self.name)
+      child_node.move_to_child_of(tag_nodes[0].id)
+      puts "Added node under tag"
+    else
+      puts "Can't add this tag because it acts as multiple tag parents. Please choose one:"
+      tag_nodes.each {|e| puts e.to_otl}
+    end
+  end
+  
+  def tags
+    self.class.tag_tree.find_descendants(self.name).map(&:parent)
+  end
+  
+  def tag_names
+    tags.map(&:name)
+  end
+  
+  def tag_trees
+    self.tags.each {|e| puts e.to_otl}
+    nil
+  end
+  
+  def snode
+    unless @snode
+      if self.root.name == SEMANTIC_ROOT
+        @snode = self
+      else
+        @snode = self.class.semantic_tree.find_descendants(self.name)[0]
+      end
+    end
+    @snode
+  end
+  
+  def stree
+    if snode
+      if snode.children.empty?
+        puts snode.parent.to_otl
+      else
+        puts snode.to_otl
+      end
+    else
+      puts "No definition"
+    end
+  end
+  
+  def find_descendants(*names)
+    descendants.find(:all, :conditions=>%[name IN (#{names.map{|e| "'#{e}'"}.join(',')})])
+  end
+  
+  def parent?; !leaf?; end
   class <<self
+    def semantic_tree
+      self.find_by_name(SEMANTIC_ROOT)
+    end
+    def tag_tree
+      self.find_by_name(TAGS_ROOT)
+    end
+    #check for those with tagged items and those that are leaves
+    def nonsemantic_tags(exclude_top_levels=false)
+      ns_tags = tag_tree.descendants.map(&:name) - semantic_tree.descendants.map(&:name)
+      if exclude_top_levels
+        ns_tags = tag_tree.find_descendants(*ns_tags).select {|e| e.level > 1 }.map(&:name)
+      end
+      ns_tags
+    end
+    
+    def unused_tags(exclude_parents=false)
+      used_tags = Url.tag_counts.map(&:name)
+      unused = semantic_tree.descendants.map(&:name) - used_tags
+      if exclude_parents
+        unused = semantic_tree.find_descendants(*unused).select {|e| e.leaf? }.map(&:name)
+      end
+      unused
+    end
     
     def edit_string(string)
       require 'tempfile'
