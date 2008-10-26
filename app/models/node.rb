@@ -105,11 +105,12 @@ class Node < ActiveRecord::Base
   
   def update_otl(new_otl)
     new_otl_array, delete_otl_array = parse_outlines(self.to_otl, new_otl)
-    p [new_otl_array, delete_otl_array]
+    # p ["ADD: ", new_otl_array]
+    p ["DELETE: ", delete_otl_array]
     self.class.transaction do
       new_otl_array = add_otl_nodes(new_otl_array)
       parents_hash = create_parents_hash(new_otl_array)
-      p parents_hash
+      # p parents_hash
       new_root = parents_hash.invert[:root]
       parents_hash.delete(new_root)
       root_id = update_otl_root(new_root[:id], self.id)
@@ -172,7 +173,12 @@ class Node < ActiveRecord::Base
   end
   
   def delete_otl_nodes(delete_otl_array)
-    delete_otl_array.each {|e| puts "Deleting node #{e[:id]}"; self.class.find(e[:id]).destroy}
+    delete_otl_array.each {|e| 
+      if (node = self.class.find_by_id(e[:id]))
+        node.destroy
+        puts "Deleted node #{e[:id]}"
+      end
+    }
   end
   
   # def update_node_order_with_children_hash(current_node, children_hash)
@@ -203,10 +209,9 @@ class Node < ActiveRecord::Base
   #   arr.select {|e| e.root.name == TAGS_ROOT}
   # end
   
-  def add_tag(tag, context=nil)
-    tag_nodes = self.class.tag_tree.find_descendants(tag).select {|e|
-      e.parent?
-    }
+  def add_tag(tag, options={})
+    tag_nodes = self.class.tag_tree.find_descendants(tag)
+    tag_nodes = tag_nodes.select {|e| e.parent? } if options[:only_parents]
     if tag_nodes.size == 0
       tag_node = self.class.create(:name=>tag)
       tag_node.move_to_child_of self.class.tag_tree.root.id
@@ -225,7 +230,11 @@ class Node < ActiveRecord::Base
   end
   
   def tags
-    self.class.tag_tree.find_descendants(self.name).map(&:parent)
+    if self.root.name == TAGS_ROOT
+      self.root.find_descendants(self.name).map(&:parent)
+    else
+      self.tag_nodes(self.name).map(&:parent)
+    end
   end
   
   def tag_names
@@ -242,21 +251,26 @@ class Node < ActiveRecord::Base
       if self.root.name == SEMANTIC_ROOT
         @snode = self
       else
-        @snode = self.class.semantic_tree.find_descendants(self.name)[0]
+        @snode = self.semantic_node(self.name)
       end
     end
     @snode
   end
   
+  #if no children display with focus on level above it
+  def smart_tree
+    if self.children.empty?
+      puts self.parent.to_otl
+    else
+      puts self.to_otl
+    end
+  end
+  
   def stree
     if snode
-      if snode.children.empty?
-        puts snode.parent.to_otl
-      else
-        puts snode.to_otl
-      end
+      snode.smart_tree
     else
-      puts "No definition"
+      puts "No semantic node for '#{self.name}'"
     end
   end
   
@@ -264,27 +278,79 @@ class Node < ActiveRecord::Base
     descendants.find(:all, :conditions=>%[name IN (#{names.map{|e| "'#{e}'"}.join(',')})])
   end
   
+  def find_descendant(name)
+    find_descendants(name)[0]
+  end
   def parent?; !leaf?; end
   class <<self
     def semantic_tree
       self.find_by_name(SEMANTIC_ROOT)
     end
+    
+    def semantic_node(name)
+      nodes = semantic_tree.find_descendants(name)
+      if nodes.size > 1
+        puts "More than one semantic node found: #{nodes.map(&:id).join(',')}"
+      end
+      nodes[0]
+    end
+    
     def tag_tree
       self.find_by_name(TAGS_ROOT)
     end
-    #check for those with tagged items and those that are leaves
-    def nonsemantic_tags(exclude_top_levels=false)
+    
+    def tag_nodes(name)
+      tag_tree.find_descendants(name)
+    end
+    
+    def status(name)
+      puts "Semantic:"
+      if (node = semantic_node(name))
+        node.smart_tree
+      else
+        puts "None found"
+      end
+      puts "Tags:"
+      nodes = tag_nodes(name)
+      if nodes.empty?
+        puts "None found"
+      else
+        nodes[0].tag_trees
+      end
+    end
+    
+    #check for nodes that are tagged but not semantically defined
+    def tagged_but_not_semantic(exclude_top_levels=false)
       ns_tags = tag_tree.descendants.map(&:name) - semantic_tree.descendants.map(&:name)
       if exclude_top_levels
         ns_tags = tag_tree.find_descendants(*ns_tags).select {|e| e.level > 1 }.map(&:name)
       end
-      ns_tags
+      ns_tags.uniq
     end
     
-    def unused_tags(exclude_parents=false)
-      used_tags = Url.tag_counts.map(&:name)
-      unused = semantic_tree.descendants.map(&:name) - used_tags
-      if exclude_parents
+    def used_tags(hash={})
+      hash = hash.slice(:conditions, :order, :group, :limit, :id)
+      if (id = hash.delete(:id))
+        hash[:conditions] = "urls.id < #{id}"
+      end
+      Url.tag_counts(hash).map(&:name)
+    end
+    
+    def used_but_not_semantic(options={})
+      arr = used_tags(options) - semantic_tree.descendants.map(&:name)
+      unless options[:include_nonsemantic]
+        arr -= tag_tree.find_descendant('nonsemantic').descendants.map(&:name)
+      end
+      arr
+    end
+    
+    def used_but_not_tagged(options={})
+      used_tags(options) - tag_tree.descendants.map(&:name)
+    end
+    
+    def semantic_but_not_used(options={})
+      unused = semantic_tree.descendants.map(&:name) - used_tags(options)
+      if options[:exclude_parents]
         unused = semantic_tree.find_descendants(*unused).select {|e| e.leaf? }.map(&:name)
       end
       unused
