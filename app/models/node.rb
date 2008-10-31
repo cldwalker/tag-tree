@@ -54,47 +54,34 @@ class Node < ActiveRecord::Base
   
   SEMANTIC_ROOT = 'semantic'
   TAGS_ROOT = 'tags'
-  #currently get [[5, [6, [8]], [7]]]
-  #should be [[5, [[6, 8], 7]]]
-  def to_aoa
-    aoa = []
-    if self.children.empty?
-      aoa << self.id
-    else
-      aoa = [self.id]
-      child_aoa = self.children.map(&:to_aoa)
-      aoa << child_aoa
-    end
-    aoa
-  end
+  
+  #currently get [[5, [6, [8]], [7]]] but should be [[5, [[6, 8], 7]]]
+  # def to_aoa
+  #   aoa = []
+  #   if self.children.empty?
+  #     aoa << self.id
+  #   else
+  #     aoa = [self.id]
+  #     child_aoa = self.children.map(&:to_aoa)
+  #     aoa << child_aoa
+  #   end
+  #   aoa
+  # end
   
   def to_otl_array
     otl_to_array(self.to_otl)
   end
   
-  def to_otl
+  def to_otl(max_level=nil, level=0)
     otl = self.to_otl_node
-    self.children.each {|e| otl += e.to_otl }
+    level += 1
+    return otl if max_level && level > max_level
+    self.children.each {|e| otl += e.to_otl(max_level, level) }
     otl
   end
   
   def to_otl_node
     "\t" * level + "#{self.id}: " + self.name + "\n"
-  end
-  
-  def to_ttree
-    tree = []
-    tree << build_ttree_node(tree)
-    tree
-  end
-  
-  def build_ttree_node(tree)
-    node = {:id=>self.id, :txt=>name, :editable=>true, :level=>self.level}
-    if !self.children.empty?
-      children_nodes = self.children.map {|e| e.build_ttree_node(tree)}
-      node[:items] = children_nodes
-    end
-    node
   end
   
   def text_update
@@ -191,24 +178,7 @@ class Node < ActiveRecord::Base
   #   end
   # end
   
-  #nodes with same name
-  def clones
-    unless @clones
-      @clones = self.class.find_all_by_name(self.name)
-      @clones.delete(self)
-    end
-    @clones
-  end
-  
-  def clone_parents; self.clones.map(&:parent); end
-  #returns tree roots
-  def clone_trees; self.clones.map(&:root); end
-  # def tags
-  #   arr = self.clone_parents
-  #   arr << self.parent
-  #   arr.select {|e| e.root.name == TAGS_ROOT}
-  # end
-  
+  #From any tree
   def add_tag(tag, options={})
     tag_nodes = self.class.tag_tree.find_descendants(tag)
     tag_nodes = tag_nodes.select {|e| e.parent? } if options[:only_parents]
@@ -230,47 +200,39 @@ class Node < ActiveRecord::Base
   end
   
   def tags
-    if self.root.name == TAGS_ROOT
-      self.root.find_descendants(self.name).map(&:parent)
-    else
-      self.tag_nodes(self.name).map(&:parent)
-    end
+    @tags ||= self.class.tag_nodes(self.name).map(&:parent)
   end
   
   def tag_names
     tags.map(&:name)
   end
   
-  def tag_trees
-    self.tags.each {|e| puts e.to_otl}
+  def tagged_by
+    @tagged_by ||= self.class.tag_tree.find_descendants(self.name).map(&:children).flatten
+  end
+  
+  def tagged_by_names; tagged_by.map(&:name); end
+  
+  def tag_trees(level=1)
+    self.tags.each {|e| puts e.to_otl(level)}
     nil
   end
   
-  def snode
-    unless @snode
-      if self.root.name == SEMANTIC_ROOT
-        @snode = self
-      else
-        @snode = self.semantic_node(self.name)
-      end
-    end
-    @snode
+  def tagged_by_trees(level=1)
+    self.tagged_by.each {|e| puts e.to_otl(level)}
+    nil
+  end
+  
+  def stats
+    descendants.map(&:name).count_hash.sort {|a,b| b[1]<=>a[1] }
   end
   
   #if no children display with focus on level above it
   def smart_tree
     if self.children.empty?
-      puts self.parent.to_otl
+      puts self.parent.to_otl(1)
     else
       puts self.to_otl
-    end
-  end
-  
-  def stree
-    if snode
-      snode.smart_tree
-    else
-      puts "No semantic node for '#{self.name}'"
     end
   end
   
@@ -282,6 +244,7 @@ class Node < ActiveRecord::Base
     find_descendants(name)[0]
   end
   def parent?; !leaf?; end
+  
   class <<self
     def semantic_tree
       self.find_by_name(SEMANTIC_ROOT)
@@ -299,6 +262,10 @@ class Node < ActiveRecord::Base
       self.find_by_name(TAGS_ROOT)
     end
     
+    def tag_node(name)
+      tag_tree.find_descendant(name)
+    end
+    
     def tag_nodes(name)
       tag_tree.find_descendants(name)
     end
@@ -308,14 +275,15 @@ class Node < ActiveRecord::Base
       if (node = semantic_node(name))
         node.smart_tree
       else
-        puts "None found"
+        puts "Not found"
       end
-      puts "Tags:"
-      nodes = tag_nodes(name)
-      if nodes.empty?
-        puts "None found"
+      if (node = tag_node(name))
+        puts "#{node.tags.length} Tags: #{node.tag_names.join(', ')}"
+        node.tag_trees
+        puts "#{node.tagged_by.length} Tagged Bys: #{node.tagged_by_names.join(', ')}"
+        node.tagged_by_trees
       else
-        nodes[0].tag_trees
+        puts "No tags or tagged by"
       end
     end
     
@@ -356,14 +324,6 @@ class Node < ActiveRecord::Base
       unused
     end
     
-    def edit_string(string)
-      require 'tempfile'
-      tempfile = Tempfile.new('edit')
-      File.open(tempfile.path,'w') {|f| f.write(string) }
-      system("#{ENV['editor'] || 'vim'} #{tempfile.path}")
-      File.read(tempfile.path)
-    end
-    
     def update_otl(root_id, new_otl)
       find(root_id).update_otl(new_otl)
     end
@@ -384,33 +344,68 @@ class Node < ActiveRecord::Base
     #   aoa
     # end
     
-    def update_ttree(root_id, ttree)
-      ids_parents = ids_and_parents_hash(ttree)
-      root_id = ids_parents.invert[:root]
-      ids_parents.delete(root_id)
-      root = Item.find(root_id)
-      if root_id != root.id
-        Item.find(root.id).move_to_root
-      end
-      ids_parents.each do |id, parent_id|
-        item = Item.find(id)
-        item.move_to_child_of(parent_id) if item.parent_id != parent_id
-      end
-    end
-    
-    def ids_and_parents_hash(ttree)
-      hash = {}
-      parent = :root
-      parse_level(ttree, parent, hash)
-      hash
-    end
-    
-    def parse_level(nodes, parent, hash)
-      nodes.each do |e|
-        hash[e['id']] = parent
-        parse_level(e['items'],e['id'],hash) if e['items']
-      end
-    end    
+  
   end
   
+end
+
+__END__
+
+#Assuming many trees
+  #nodes with same name
+  def clones
+    unless @clones
+      @clones = self.class.find_all_by_name(self.name)
+      @clones.delete(self)
+    end
+    @clones
+  end
+
+  def clone_parents; self.clones.map(&:parent); end
+  #returns tree roots
+  def clone_trees; self.clones.map(&:root); end
+
+
+###Later: TafelTree view methods
+def to_ttree
+  tree = []
+  tree << build_ttree_node(tree)
+  tree
+end
+
+def build_ttree_node(tree)
+  node = {:id=>self.id, :txt=>name, :editable=>true, :level=>self.level}
+  if !self.children.empty?
+    children_nodes = self.children.map {|e| e.build_ttree_node(tree)}
+    node[:items] = children_nodes
+  end
+  node
+end
+
+def update_ttree(root_id, ttree)
+  ids_parents = ids_and_parents_hash(ttree)
+  root_id = ids_parents.invert[:root]
+  ids_parents.delete(root_id)
+  root = Item.find(root_id)
+  if root_id != root.id
+    Item.find(root.id).move_to_root
+  end
+  ids_parents.each do |id, parent_id|
+    item = Item.find(id)
+    item.move_to_child_of(parent_id) if item.parent_id != parent_id
+  end
+end
+
+def ids_and_parents_hash(ttree)
+  hash = {}
+  parent = :root
+  parse_level(ttree, parent, hash)
+  hash
+end
+
+def parse_level(nodes, parent, hash)
+  nodes.each do |e|
+    hash[e['id']] = parent
+    parse_level(e['items'],e['id'],hash) if e['items']
+  end
 end
