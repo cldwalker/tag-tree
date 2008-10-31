@@ -12,17 +12,22 @@ ActiveRecord::Base.class_eval %[
 ]
 
 Node.class_eval %[
-  def self.st(value); self.status(value); end
-  def to; puts self.to_otl; end
+  def to(*args); puts self.to_otl(*args); end
   def u; puts self.text_update; end
   alias_method :tn, :tag_names
+  alias_method :tbn, :tagged_by_names
   alias_method :tt, :tag_trees
+  alias_method :tbt, :tagged_by_trees
   alias_method :fds, :find_descendants
   alias_method :fd, :find_descendant
 ]
   
+def st(name)
+  Node.status(name)
+end
+
 def tn(name)
-  Node.tag_nodes(name)
+  Node.tag_node(name)
 end
 
 def sn(name)
