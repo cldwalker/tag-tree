@@ -13,6 +13,10 @@ ActiveRecord::Base.class_eval %[
   def self.stw(*args); self.semantic_tagged_with(*args);end
 ]
 
+Url.class_eval %[
+  alias_method :t, :tag_and_save
+]
+
 Node.class_eval %[
   def to(*args); puts self.to_otl(*args); end
   def u; puts self.text_update; end

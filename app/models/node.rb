@@ -52,8 +52,13 @@ class Node < ActiveRecord::Base
   belongs_to :objectable, :polymorphic=>true
   acts_as_nested_set
   
+  #tree which stores is-a relationships between words
   SEMANTIC_ROOT = 'semantic'
-  TAGS_ROOT = 'tags'
+  #branch for words that are semantic bastards
+  NONSEMANTIC_NODE = 'nonsemantic'
+  #tree which stores categorical/hierarchial relationship between words
+  #this name is misleading, words would've been better
+  TAG_ROOT = 'tags'
   
   #currently get [[5, [6, [8]], [7]]] but should be [[5, [[6, 8], 7]]]
   # def to_aoa
@@ -199,6 +204,7 @@ class Node < ActiveRecord::Base
     end
   end
   
+  #tags are one level deep whereas tag ancestors recurse all levels
   def tags
     @tags ||= self.class.tag_nodes(self.name).map(&:parent)
   end
@@ -259,11 +265,25 @@ class Node < ActiveRecord::Base
     end
     
     def semantic_nodes(*names)
+      return [] if names.empty?
       semantic_tree.find_descendants(*names)
     end
     
+    def semantic_ancestors_of(name)
+      if (node = semantic_node(name))
+        ancestors = node.ancestors.map(&:name) 
+        if ancestors.include?(Node::NONSEMANTIC_NODE)
+          return []
+        else
+          ancestors - [Node::SEMANTIC_ROOT] 
+        end
+      else
+        []
+      end
+    end
+    
     def tag_tree
-      self.find_by_name(TAGS_ROOT)
+      self.find_by_name(TAG_ROOT)
     end
     
     def tag_node(name)
@@ -272,6 +292,20 @@ class Node < ActiveRecord::Base
     
     def tag_nodes(name)
       tag_tree.find_descendants(name)
+    end
+    
+    def tag_ancestors_of(name)
+      tag_nodes(name).map(&:ancestors).flatten.map(&:name) - [Node::TAG_ROOT]
+    end
+    
+    #tag word == tag_nodes
+    def tag_word_ancestor_of?(tag, possible_children)
+      tag_children = tag_nodes(tag).map(&:descendants).flatten.map(&:name).uniq
+      semantic_tag_children = semantic_nodes(*tag_children).map(&:descendants).flatten.map(&:name).uniq
+      tag_children += semantic_tag_children
+      diff = possible_children & tag_children
+      puts "Word '#{tag}' is ancestor of: #{diff.inspect}" unless diff.empty?
+      !diff.empty?
     end
     
     def status(name)
@@ -295,7 +329,7 @@ class Node < ActiveRecord::Base
     def tagged_but_not_semantic(exclude_top_levels=false)
       ns_tags = tag_tree.descendants.map(&:name) - semantic_tree.descendants.map(&:name)
       if exclude_top_levels
-        ns_tags = tag_nodes(*ns_tags).select {|e| e.level > 1 }.map(&:name)
+        ns_tags = tag_tree.find_descendants(*ns_tags).select {|e| e.level > 1 }.map(&:name)
       end
       ns_tags.uniq
     end
