@@ -180,7 +180,7 @@ class Node < ActiveRecord::Base
   
   #From any tree
   def add_tag(tag, options={})
-    tag_nodes = self.class.tag_tree.find_descendants(tag)
+    tag_nodes = self.class.tag_nodes(tag)
     tag_nodes = tag_nodes.select {|e| e.parent? } if options[:only_parents]
     if tag_nodes.size == 0
       tag_node = self.class.create(:name=>tag)
@@ -208,7 +208,7 @@ class Node < ActiveRecord::Base
   end
   
   def tagged_by
-    @tagged_by ||= self.class.tag_tree.find_descendants(self.name).map(&:children).flatten
+    @tagged_by ||= self.class.tag_nodes(self.name).map(&:children).flatten
   end
   
   def tagged_by_names; tagged_by.map(&:name); end
@@ -219,7 +219,7 @@ class Node < ActiveRecord::Base
   end
   
   def tagged_by_trees(level=1)
-    self.tagged_by.each {|e| puts e.to_otl(level)}
+    self.tagged_by.map(&:parent).uniq.each {|e| puts e.to_otl(level)}
     nil
   end
   
@@ -253,9 +253,13 @@ class Node < ActiveRecord::Base
     def semantic_node(name)
       nodes = semantic_tree.find_descendants(name)
       if nodes.size > 1
-        puts "More than one semantic node found: #{nodes.map(&:id).join(',')}"
+        puts "More than one semantic node found for '#{name}': #{nodes.map(&:id).join(',')}"
       end
       nodes[0]
+    end
+    
+    def semantic_nodes(*names)
+      semantic_tree.find_descendants(*names)
     end
     
     def tag_tree
@@ -291,37 +295,9 @@ class Node < ActiveRecord::Base
     def tagged_but_not_semantic(exclude_top_levels=false)
       ns_tags = tag_tree.descendants.map(&:name) - semantic_tree.descendants.map(&:name)
       if exclude_top_levels
-        ns_tags = tag_tree.find_descendants(*ns_tags).select {|e| e.level > 1 }.map(&:name)
+        ns_tags = tag_nodes(*ns_tags).select {|e| e.level > 1 }.map(&:name)
       end
       ns_tags.uniq
-    end
-    
-    def used_tags(hash={})
-      hash = hash.slice(:conditions, :order, :group, :limit, :id)
-      if (id = hash.delete(:id))
-        hash[:conditions] = "urls.id < #{id}"
-      end
-      Url.tag_counts(hash).map(&:name)
-    end
-    
-    def used_but_not_semantic(options={})
-      arr = used_tags(options) - semantic_tree.descendants.map(&:name)
-      unless options[:include_nonsemantic]
-        arr -= tag_tree.find_descendant('nonsemantic').descendants.map(&:name)
-      end
-      arr
-    end
-    
-    def used_but_not_tagged(options={})
-      used_tags(options) - tag_tree.descendants.map(&:name)
-    end
-    
-    def semantic_but_not_used(options={})
-      unused = semantic_tree.descendants.map(&:name) - used_tags(options)
-      if options[:exclude_parents]
-        unused = semantic_tree.find_descendants(*unused).select {|e| e.leaf? }.map(&:name)
-      end
-      unused
     end
     
     def update_otl(root_id, new_otl)

@@ -1,4 +1,6 @@
 #this file contains handy methods and aliases to be used from the console
+require 'pp'
+
 U = Url
 Tr = Tree
 T = Tag
@@ -37,6 +39,24 @@ end
 def tags(id_or_name)
   node = Node.find_by_id(id_or_name) || Node.find_by_name(id_or_name)
   node.tag_names
+end
+
+#url-paged
+def up(offset=0, limit=20)
+  columns = [:id, :name, :tag_names]
+  uf(offset, limit).amap(*columns)
+end
+
+#url-find
+def uf(offset=0, limit=20)
+  Url.find(:all, :offset=>offset, :limit=>limit)
+end
+
+#urls-tagged
+def ut(*args)
+  tag = args.shift
+  args = [:id, :name, :tag_names] if args.empty?
+  Url.find_tagged_with(tag).amap(*args)
 end
 
 class Array
