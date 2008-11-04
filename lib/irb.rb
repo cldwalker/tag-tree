@@ -18,6 +18,7 @@ ActiveRecord::Base.class_eval %[
 Url.class_eval %[
   alias_method :t, :tag_and_save
   class<<self
+    alias_method :t, :used_tags
     alias_method :us, :used_but_not_semantic
     alias_method :ut, :used_to_tag
     alias_method :tr, :tags_related
@@ -35,9 +36,13 @@ Node.class_eval %[
   alias_method :tbt, :tagged_by_trees
   alias_method :fds, :find_descendants
   alias_method :fd, :find_descendant
+  alias_method :dl, :descendants_by_level
   class<<self
+    alias_method :s, :semantic_names
+    alias_method :t, :tag_names
     alias_method :cs, :create_semantic_node_under
     alias_method :ct, :create_tag_node_under
+    alias_method :r, :rebuild!
   end
 ]
   

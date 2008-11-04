@@ -252,6 +252,12 @@ class Node < ActiveRecord::Base
   end
   def parent?; !leaf?; end
   
+  def descendants_by_level(level)
+    self.descendants.select {|e| 
+      e.level == level
+    }
+  end
+  
   #assuming in semantic tree
   def semantic_ancestors
     node_ancestors = self.ancestors.map(&:name) 
@@ -269,6 +275,10 @@ class Node < ActiveRecord::Base
   class <<self
     def semantic_tree
       self.find_by_name(SEMANTIC_ROOT)
+    end
+    
+    def semantic_names(level=nil)
+      level ? semantic_tree.descendants_by_level(level).map(&:name) : semantic_tree.descendants.map(&:name)
     end
     
     def semantic_node(name)
@@ -325,6 +335,10 @@ class Node < ActiveRecord::Base
     
     def tag_tree
       self.find_by_name(TAG_ROOT)
+    end
+    
+    def tag_names
+      tag_tree.descendants.map(&:name)
     end
     
     def tag_node(name)
