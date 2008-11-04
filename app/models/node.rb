@@ -183,6 +183,7 @@ class Node < ActiveRecord::Base
   #   end
   # end
   
+  #TODO: merge this with create_node_under()
   #From any tree
   def add_tag(tag, options={})
     tag_nodes = self.class.tag_nodes(tag)
@@ -291,6 +292,7 @@ class Node < ActiveRecord::Base
       end
     end
     
+    #TODO: use create_node_under()
     def create_non_semantic(*args)
       options = args[-1].is_a?(Hash) ? args.pop : {}
       options.reverse_merge!(:type=>:noun)
@@ -299,6 +301,26 @@ class Node < ActiveRecord::Base
       else
         puts "nonsemantic type '#{options[:type]}' not found"
       end
+    end
+    
+    def create_node_under(parent_node, new_name, parent_name)
+      if parent_node
+        node = Node.create(:name=>new_name.to_s)
+        node.move_to_child_of parent_node.id
+        puts parent_node.to_otl
+      else
+        puts "Parent node '#{parent_name}' not found"
+      end
+    end
+    
+    def create_semantic_node_under(new_name, parent_name)
+      parent_node = semantic_node(parent_name)
+      create_node_under(parent_node, new_name, parent_name)
+    end
+    
+    def create_tag_node_under(new_name, parent_name)
+      parent_node = tag_node(parent_name)
+      create_node_under(parent_node, new_name, parent_name)
     end
     
     def tag_tree

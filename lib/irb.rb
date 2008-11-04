@@ -35,6 +35,10 @@ Node.class_eval %[
   alias_method :tbt, :tagged_by_trees
   alias_method :fds, :find_descendants
   alias_method :fd, :find_descendant
+  class<<self
+    alias_method :cs, :create_semantic_node_under
+    alias_method :ct, :create_tag_node_under
+  end
 ]
   
 def st(name)
@@ -81,5 +85,14 @@ end
 class Array
   def amap(*fields)
     map {|e| fields.map {|field| e.send(field) }}
+  end
+  def method_missing(method,*args,&block)
+          shortcut_klasses = [ActiveRecord::Base]
+          #if all have one of shortcut klasses as an ancestor
+          if self.all? {|e| shortcut_klasses.any? {|k| e.is_a?(k)} }
+            self.map {|e| e.send(method,*args,&block) }
+          else
+            super
+          end
   end
 end
