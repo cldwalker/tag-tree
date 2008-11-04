@@ -251,6 +251,20 @@ class Node < ActiveRecord::Base
   end
   def parent?; !leaf?; end
   
+  #assuming in semantic tree
+  def semantic_ancestors
+    node_ancestors = self.ancestors.map(&:name) 
+    if node_ancestors.include?(Node::NONSEMANTIC_NODE)
+      return []
+    else
+      node_ancestors - [Node::SEMANTIC_ROOT] 
+    end
+  end
+  
+  def has_semantic_parent?
+    !semantic_ancestors.empty?
+  end
+  
   class <<self
     def semantic_tree
       self.find_by_name(SEMANTIC_ROOT)
@@ -271,14 +285,19 @@ class Node < ActiveRecord::Base
     
     def semantic_ancestors_of(name)
       if (node = semantic_node(name))
-        ancestors = node.ancestors.map(&:name) 
-        if ancestors.include?(Node::NONSEMANTIC_NODE)
-          return []
-        else
-          ancestors - [Node::SEMANTIC_ROOT] 
-        end
+        node.semantic_ancestors
       else
         []
+      end
+    end
+    
+    def create_non_semantic(*args)
+      options = args[-1].is_a?(Hash) ? args.pop : {}
+      options.reverse_merge!(:type=>:noun)
+      if (parent = semantic_node(NONSEMANTIC_NODE).find_descendant(options[:type]))
+        args.map {|e| Node.create(:name=>e.to_s) }.each {|e| e.move_to_child_of parent.id}
+      else
+        puts "nonsemantic type '#{options[:type]}' not found"
       end
     end
     

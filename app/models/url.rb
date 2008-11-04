@@ -12,17 +12,31 @@ class Url < ActiveRecord::Base
       self.find_tagged_with(*args)
     end
     
-    def used_tags(hash={})
+    #should be empty otherwise tags are redundant
+    def tags_related(max_id)
+      find(:all, parse_conditions(max_id)).select {|e| e.tags_related? }
+    end
+    
+    def used_tags(max_id)
+      tag_counts(parse_conditions(max_id)).map(&:name)
+    end
+    
+    def parse_conditions(max_id, hash={})
+      hash.merge!(:id=>max_id)
       hash = hash.slice(:conditions, :order, :group, :limit, :id)
       if (id = hash.delete(:id))
-        hash[:conditions] = "urls.id < #{id}"
+        hash[:conditions] = "urls.id <= #{id}"
       end
-      tag_counts(hash).map(&:name)
+      hash
+    end
+    
+    def used_tag_counts(max_id)
+      tag_counts(parse_conditions(max_id)).map {|e| [e.name, e.count]}.sort {|a,b| b[1]<=>a[1] }
     end
     
     #should be none
-    def used_but_not_semantic(options={})
-      arr = used_tags(options) - Node.semantic_tree.descendants.map(&:name)
+    def used_but_not_semantic(max_id, options={})
+      arr = used_tags(max_id) - Node.semantic_tree.descendants.map(&:name)
       unless options[:include_nonsemantic]
         arr -= Node.semantic_node(Node::NONSEMANTIC_NODE).descendants.map(&:name)
       end
@@ -30,14 +44,26 @@ class Url < ActiveRecord::Base
     end
     
     #the fewer here, the more intricate the tag web
-    def used_but_not_tagged(options={})
-      used_tags(options) - Node.tag_tree.descendants.map(&:name)
+    def used_but_not_tagged(max_id, options={})
+      used = used_tags(max_id)
+      tag_node_names = Node.tag_tree.descendants.map(&:name)
+      used_semantically = used.select {|e| !(Node.semantic_ancestors_of(e) & tag_node_names).empty? }
+      used - used_semantically - tag_node_names
+    end
+    
+    def used_to_tag(max_id, options={})
+      words_to_tag = used_but_not_tagged(max_id)
+      #eventually include once I can relate verbs + adj to nouns
+      derivational = (Node.semantic_node(Node::NONSEMANTIC_NODE).descendants -  Node.semantic_node(:noun).descendants).map(&:name)
+      #location is one of five top levels
+      location = Node.semantic_node(:location).descendants.map(&:name)
+      words_to_tag - location - derivational
     end
     
     #shows parents + predicted semantic nodes
     #tagged_but_not_used() would do the same for the tag tree
-    def semantic_but_not_used(options={})
-      unused = Node.semantic_tree.descendants.map(&:name) - used_tags(options)
+    def semantic_but_not_used(max_id, options={})
+      unused = Node.semantic_tree.descendants.map(&:name) - used_tags(max_id)
       if options[:exclude_parents]
         unused = Node.semantic_nodes(*unused).select {|e| e.leaf? }.map(&:name)
       end
@@ -55,7 +81,8 @@ class Url < ActiveRecord::Base
   def extra_tags
     semantic_ancestors = tags.map {|e| Node.semantic_ancestors_of(e.name)}.flatten
     tag_ancestors = tags.map {|e| Node.tag_ancestors_of(e.name)}.flatten
-    (semantic_ancestors + tag_ancestors).uniq
+    semantic_tag_ancestors = semantic_ancestors.map {|e| Node.tag_ancestors_of(e)}.flatten
+    (semantic_ancestors + tag_ancestors + semantic_tag_ancestors).uniq
   end
   
   def all_tags

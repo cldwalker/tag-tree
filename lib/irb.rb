@@ -7,14 +7,23 @@ T = Tag
 N = Node
 
 ActiveRecord::Base.class_eval %[
-  def self.f(*args); self.find(*args); end
+  alias_method :ua, :update_attribute  
+  class<<self
+    alias_method :f, :find
+    alias_method :d, :destroy
+  end
   def self.fn(*args); self.find_by_name(*args); end
-  def self.ftw(*args); self.find_tagged_with(*args);end
-  def self.stw(*args); self.semantic_tagged_with(*args);end
 ]
 
 Url.class_eval %[
   alias_method :t, :tag_and_save
+  class<<self
+    alias_method :us, :used_but_not_semantic
+    alias_method :ut, :used_to_tag
+    alias_method :tr, :tags_related
+    alias_method :ftw, :find_tagged_with
+    alias_method :stw, :semantic_tagged_with
+  end
 ]
 
 Node.class_eval %[
@@ -43,6 +52,12 @@ end
 def tags(id_or_name)
   node = Node.find_by_id(id_or_name) || Node.find_by_name(id_or_name)
   node.tag_names
+end
+
+#open url object id
+def o(*url_ids)
+  urls = url_ids.map {|e| Url.find_by_id(e)}.compact.map {|e| "'#{e.name}'"}
+  system("open " + urls.join(" "))
 end
 
 #url-paged
