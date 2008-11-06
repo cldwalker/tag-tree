@@ -22,6 +22,7 @@ Url.class_eval %[
   alias_method :tl, :tag_list
   class<<self
     alias_method :t, :used_tags
+    alias_method :ts, :tag_stats
     alias_method :us, :used_but_not_semantic
     alias_method :ut, :used_to_tag
     alias_method :tr, :tags_related

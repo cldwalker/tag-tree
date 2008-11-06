@@ -77,40 +77,46 @@ class Node < ActiveRecord::Base
     otl_to_array(self.to_otl)
   end
   
+  #option aliases:c=>:count, :r=>:result
   def to_otl(max_level=nil, options={})
-    if options[:count]
-      tag_counts = Hash[*Url.used_tag_counts(options[:count]).flatten]
-      self.class.semantic_tree.parents.each do |e|
-        descendants = e.descendants.map(&:name)
-        parent_total = tag_counts.slice(*descendants).values.sum
-        tag_counts[e.name] = parent_total if parent_total > 0
-      end
-        
-      build_otl(max_level, options) do |node|
+    if options[:c]
+      tag_counts = Url.used_semantic_tag_counts(options[:c])
+      build_otl(max_level) do |node|
         tag_counts[node.name] ? " (#{tag_counts[node.name]})" : ""
       end
+    elsif options[:r]
+      build_otl(max_level) do |node|
+        if node.leaf?
+          results = Url.semantic_tagged_with(node.name, :id=>options[:r])
+          if results.empty?
+            ""
+          else
+            "\n" + results.map{|e| otl_indent(node.level + 1) + e.to_console}.join("\n")
+          end
+        else
+          ""
+        end
+      end
     else
-      build_otl(max_level, options)
+      build_otl(max_level)
     end
   end
     
-  def build_otl(max_level, options={}, &block)
+  def build_otl(max_level, otl_level=0, &block)
     otl = self.to_otl_node
     if block_given?
       otl = otl.chomp + yield(self) + "\n"
-      puts otl
     end
-    @otl_level ||=0
-    @otl_level += 1
-    return otl if max_level && @otl_level > max_level
-    self.children.each {|e| otl += e.build_otl(max_level,options, &block) }
+    otl_level += 1
+    return otl if max_level && otl_level > max_level
+    self.children.each {|e| otl += e.build_otl(max_level,otl_level, &block) }
     otl
   end
   
   def view_otl(*args); puts self.to_otl(*args); end
-  
+  def otl_indent(indent_level); "\t" * indent_level; end
   def to_otl_node
-    "\t" * level + "#{self.id}: " + self.name + "\n"
+    otl_indent(level) + "#{self.id}: " + self.name + "\n"
   end
   
   def text_update

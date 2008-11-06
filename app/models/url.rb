@@ -5,11 +5,15 @@ class Url < ActiveRecord::Base
   
   class<<self
     #looks up semantic 
-    def semantic_tagged_with(*args)
-      children = Node.semantic_tree.find_descendant(args[0]).children.map(&:name)
-      puts "Including immediate children : #{children.join(',')}" if children.size > 0
-      args[0] = children << args[0]
-      self.find_tagged_with(*args)
+    def semantic_tagged_with(tags, options={})
+      children = (parent = Node.semantic_tree.find_descendant(tags)) ? parent.descendants.map(&:name) : []
+      if children.size > 0
+        puts "Including #{tags}'s children in query : #{children.join(',')}" 
+        tags = children + [tags]
+      end
+      results = self.find_tagged_with(tags)
+      #hack: since passing id condition doesn't work?
+      options[:id] ? results.select {|e| e.id <= options[:id]} : results
     end
     
     #should be empty otherwise tags are redundant
@@ -32,6 +36,20 @@ class Url < ActiveRecord::Base
     
     def used_tag_counts(max_id)
       tag_counts(parse_conditions(max_id)).map {|e| [e.name, e.count]}.sort {|a,b| b[1]<=>a[1] }
+    end
+    
+    def used_semantic_tag_counts(max_id)
+      tag_counts = Hash[*used_tag_counts(max_id).flatten]
+      Node.semantic_tree.parents.each do |e|
+        descendants = e.descendants.map(&:name)
+        parent_total = tag_counts.slice(*descendants).values.sum
+        tag_counts[e.name] = parent_total if parent_total > 0
+      end
+      tag_counts
+    end
+    
+    def tag_stats(max_id)
+      used_semantic_tag_counts(max_id).to_a.sort {|a,b| b[1]<=>a[1] }
     end
     
     #should be none
@@ -102,5 +120,9 @@ class Url < ActiveRecord::Base
   #checks to see if tags are related through tag + semantic trees
   def tags_related?
     tag_names.any? {|t| Node.tag_word_ancestor_of?(t, tag_names) }
+  end
+  
+  def to_console
+    "#{self.id}: #{self.name} : #{self.tag_list}"
   end
 end
