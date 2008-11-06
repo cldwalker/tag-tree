@@ -17,6 +17,9 @@ ActiveRecord::Base.class_eval %[
 
 Url.class_eval %[
   alias_method :t, :tag_and_save
+  alias_method :ta, :tag_add_and_save
+  alias_method :tr, :tag_remove_and_save
+  alias_method :tl, :tag_list
   class<<self
     alias_method :t, :used_tags
     alias_method :us, :used_but_not_semantic
@@ -28,15 +31,18 @@ Url.class_eval %[
 ]
 
 Node.class_eval %[
-  def to(*args); puts self.to_otl(*args); end
   def u; puts self.text_update; end
+  alias_method :vo, :view_otl
   alias_method :tn, :tag_names
   alias_method :tbn, :tagged_by_names
   alias_method :tt, :tag_trees
   alias_method :tbt, :tagged_by_trees
+  alias_method :d, :descendants
   alias_method :fds, :find_descendants
   alias_method :fd, :find_descendant
   alias_method :dl, :descendants_by_level
+  alias_method :pn, :parent_names
+  alias_method :ln, :leaf_names
   class<<self
     alias_method :s, :semantic_names
     alias_method :t, :tag_names
@@ -52,6 +58,14 @@ end
 
 def tn(name)
   Node.tag_node(name)
+end
+
+def tvo(name)
+  Node.tag_node(name).view_otl
+end
+
+def svo(name)
+  Node.semantic_node(name).view_otl
 end
 
 def sn(name)

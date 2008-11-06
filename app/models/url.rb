@@ -73,6 +73,16 @@ class Url < ActiveRecord::Base
   
   def tag_names; tags.map(&:name); end
   
+  def tag_add_and_save(tag_list)
+    self.tag_list = self.tag_list.add(tag_list, :parse=>true).to_s
+    self.save
+  end
+  
+  def tag_remove_and_save(tag_list)
+    self.tag_list = self.tag_list.remove(tag_list, :parse=>true).to_s
+    self.save
+  end
+  
   def tag_and_save(tag_list)
     self.tag_list = tag_list
     self.save

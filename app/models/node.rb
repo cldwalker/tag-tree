@@ -77,13 +77,37 @@ class Node < ActiveRecord::Base
     otl_to_array(self.to_otl)
   end
   
-  def to_otl(max_level=nil, level=0)
+  def to_otl(max_level=nil, options={})
+    if options[:count]
+      tag_counts = Hash[*Url.used_tag_counts(options[:count]).flatten]
+      self.class.semantic_tree.parents.each do |e|
+        descendants = e.descendants.map(&:name)
+        parent_total = tag_counts.slice(*descendants).values.sum
+        tag_counts[e.name] = parent_total if parent_total > 0
+      end
+        
+      build_otl(max_level, options) do |node|
+        tag_counts[node.name] ? " (#{tag_counts[node.name]})" : ""
+      end
+    else
+      build_otl(max_level, options)
+    end
+  end
+    
+  def build_otl(max_level, options={}, &block)
     otl = self.to_otl_node
-    level += 1
-    return otl if max_level && level > max_level
-    self.children.each {|e| otl += e.to_otl(max_level, level) }
+    if block_given?
+      otl = otl.chomp + yield(self) + "\n"
+      puts otl
+    end
+    @otl_level ||=0
+    @otl_level += 1
+    return otl if max_level && @otl_level > max_level
+    self.children.each {|e| otl += e.build_otl(max_level,options, &block) }
     otl
   end
+  
+  def view_otl(*args); puts self.to_otl(*args); end
   
   def to_otl_node
     "\t" * level + "#{self.id}: " + self.name + "\n"
@@ -258,6 +282,11 @@ class Node < ActiveRecord::Base
     }
   end
   
+  def parents
+    descendants.select {|e| e.parent?}
+  end
+  def parent_names; parents.map(&:name); end
+  def leaf_names; leaves.map(&:name); end
   #assuming in semantic tree
   def semantic_ancestors
     node_ancestors = self.ancestors.map(&:name) 
@@ -266,6 +295,10 @@ class Node < ActiveRecord::Base
     else
       node_ancestors - [Node::SEMANTIC_ROOT] 
     end
+  end
+  
+  def tag_ancestors
+    self.class.tag_ancestors_of(self.name)
   end
   
   def has_semantic_parent?
@@ -350,7 +383,7 @@ class Node < ActiveRecord::Base
     end
     
     def tag_ancestors_of(name)
-      tag_nodes(name).map(&:ancestors).flatten.map(&:name) - [Node::TAG_ROOT]
+      tag_nodes(name).map(&:ancestors).flatten.map(&:name).reverse.uniq - [Node::TAG_ROOT]
     end
     
     #tag word == tag_nodes
