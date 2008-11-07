@@ -55,7 +55,7 @@ class Node < ActiveRecord::Base
   #tree which stores is-a relationships between words
   SEMANTIC_ROOT = 'semantic'
   #branch for words that are semantic bastards
-  NONSEMANTIC_NODE = 'nonsemantic'
+  NONSEMANTIC_ROOT = 'nonsemantic'
   #tree which stores categorical/hierarchial relationship between words
   #this name is misleading, words would've been better
   TAG_ROOT = 'tags'
@@ -290,6 +290,7 @@ class Node < ActiveRecord::Base
     }
   end
   
+  def descendant_names; descendants.map(&:name); end
   def parents
     descendants.select {|e| e.parent?}
   end
@@ -297,12 +298,7 @@ class Node < ActiveRecord::Base
   def leaf_names; leaves.map(&:name); end
   #assuming in semantic tree
   def semantic_ancestors
-    node_ancestors = self.ancestors.map(&:name) 
-    if node_ancestors.include?(Node::NONSEMANTIC_NODE)
-      return []
-    else
-      node_ancestors - [Node::SEMANTIC_ROOT] 
-    end
+    self.ancestors.map(&:name) - [Node::SEMANTIC_ROOT] 
   end
   
   def tag_ancestors
@@ -314,6 +310,19 @@ class Node < ActiveRecord::Base
   end
   
   class <<self
+    def semantic_words_unique? 
+      semantic_words = nonsemantic_tree.descendant_names  + semantic_tree.descendant_names
+      semantic_words.size == semantic_words.uniq.size
+    end
+    
+    def nonsemantic_tree
+      find_by_name(NONSEMANTIC_ROOT)
+    end
+    
+    def nonsemantic_node(name)
+      nonsemantic_tree.find_descendant(name)
+    end
+    
     def semantic_tree
       self.find_by_name(SEMANTIC_ROOT)
     end
@@ -323,11 +332,7 @@ class Node < ActiveRecord::Base
     end
     
     def semantic_node(name)
-      nodes = semantic_tree.find_descendants(name)
-      if nodes.size > 1
-        puts "More than one semantic node found for '#{name}': #{nodes.map(&:id).join(',')}"
-      end
-      nodes[0]
+      semantic_tree.find_descendant(name)
     end
     
     def semantic_nodes(*names)
@@ -343,25 +348,21 @@ class Node < ActiveRecord::Base
       end
     end
     
-    #TODO: use create_node_under()
-    def create_non_semantic(*args)
-      options = args[-1].is_a?(Hash) ? args.pop : {}
-      options.reverse_merge!(:type=>:noun)
-      if (parent = semantic_node(NONSEMANTIC_NODE).find_descendant(options[:type]))
-        args.map {|e| Node.create(:name=>e.to_s) }.each {|e| e.move_to_child_of parent.id}
-      else
-        puts "nonsemantic type '#{options[:type]}' not found"
-      end
-    end
-    
     def create_node_under(parent_node, new_name, parent_name)
       if parent_node
-        node = Node.create(:name=>new_name.to_s)
+        node = create(:name=>new_name.to_s)
         node.move_to_child_of parent_node.id
         puts parent_node.to_otl
       else
         puts "Parent node '#{parent_name}' not found"
       end
+    end
+    
+    def create_nonsemantic_node(*args)
+      options = args[-1].is_a?(Hash) ? args.pop : {}
+      parent_name = options[:type] || :noun
+      parent_node = nonsemantic_node(parent_name)
+      args.each {|e| create_node_under(parent_node, e, parent_name) }
     end
     
     def create_semantic_node_under(new_name, parent_name)

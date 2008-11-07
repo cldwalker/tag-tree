@@ -56,7 +56,7 @@ class Url < ActiveRecord::Base
     def used_but_not_semantic(max_id, options={})
       arr = used_tags(max_id) - Node.semantic_names
       unless options[:include_nonsemantic]
-        arr -= Node.semantic_node(Node::NONSEMANTIC_NODE).descendants.map(&:name)
+        arr -= Node.nonsemantic_tree.descendants.map(&:name)
       end
       arr
     end
@@ -72,7 +72,7 @@ class Url < ActiveRecord::Base
     def used_to_tag(max_id, options={})
       words_to_tag = used_but_not_tagged(max_id)
       #eventually include once I can relate verbs + adj to nouns
-      derivational = (Node.semantic_node(Node::NONSEMANTIC_NODE).descendants -  Node.semantic_node(:noun).descendants).map(&:name)
+      derivational = (Node.nonsemantic_tree.descendants -  Node.nonsemantic_node(:noun).descendants).map(&:name)
       #location is one of five top levels
       location = Node.semantic_node(:location).descendants.map(&:name)
       words_to_tag - location - derivational

@@ -39,6 +39,7 @@ Node.class_eval %[
   alias_method :tt, :tag_trees
   alias_method :tbt, :tagged_by_trees
   alias_method :d, :descendants
+  alias_method :dn, :descendant_names
   alias_method :fds, :find_descendants
   alias_method :fd, :find_descendant
   alias_method :dl, :descendants_by_level
@@ -47,12 +48,17 @@ Node.class_eval %[
   class<<self
     alias_method :s, :semantic_names
     alias_method :t, :tag_names
+    alias_method :cn, :create_nonsemantic_node
     alias_method :cs, :create_semantic_node_under
     alias_method :ct, :create_tag_node_under
     alias_method :r, :rebuild!
   end
 ]
-  
+
+def ns; Node.nonsemantic_tree; end
+def s; Node.semantic_tree; end
+def t; Node.tag_tree; end
+
 def st(name)
   Node.status(name)
 end
@@ -61,12 +67,12 @@ def tn(name)
   Node.tag_node(name)
 end
 
-def tvo(name)
-  Node.tag_node(name).view_otl
+def tvo(*args)
+  Node.tag_node(args.shift).view_otl(*args)
 end
 
-def svo(name)
-  Node.semantic_node(name).view_otl
+def svo(*args)
+  Node.semantic_node(args.shift).view_otl(*args)
 end
 
 def sn(name)
