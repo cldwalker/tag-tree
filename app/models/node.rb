@@ -244,6 +244,8 @@ class Node < ActiveRecord::Base
     tags.map(&:name)
   end
   
+  def extra_tags; self.class.extra_tags(self.name); end
+  
   def tagged_by
     @tagged_by ||= self.class.tag_nodes(self.name).map(&:children).flatten
   end
@@ -401,7 +403,24 @@ class Node < ActiveRecord::Base
       puts "Word '#{tag}' is ancestor of: #{diff.inspect}" unless diff.empty?
       !diff.empty?
     end
-    
+
+    def extra_tags(name, verbose=false)
+      extra = []
+      semantic_ancestors = semantic_ancestors_of(name)
+      extra << semantic_ancestors
+      puts "Semantic ancestors: #{semantic_ancestors.join(',')}" if verbose && !semantic_ancestors.empty?
+      semantic_ancestors.each do |e| 
+        results = tag_ancestors_of(e)
+        puts "Tag ancestors of #{e}: #{results.join(',')}" if verbose && !results.empty?
+        extra << results
+      end
+      
+      tag_ancestors = tag_ancestors_of(name)
+      extra << tag_ancestors
+      puts "Tag ancestors: #{tag_ancestors.join(',')}" if verbose && !tag_ancestors.empty?
+      extra.flatten.uniq
+    end
+
     def status(name)
       puts "Semantic:"
       if (node = semantic_node(name))

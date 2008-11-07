@@ -6,7 +6,7 @@ class Url < ActiveRecord::Base
   class<<self
     #looks up semantic 
     def semantic_tagged_with(tags, options={})
-      children = (parent = Node.semantic_tree.find_descendant(tags)) ? parent.descendants.map(&:name) : []
+      children = (parent = Node.semantic_node(tags)) ? parent.descendants.map(&:name) : []
       if children.size > 0
         puts "Including #{tags}'s children in query : #{children.join(',')}" 
         tags = children + [tags]
@@ -107,10 +107,9 @@ class Url < ActiveRecord::Base
   end
   
   def extra_tags
-    semantic_ancestors = tags.map {|e| Node.semantic_ancestors_of(e.name)}.flatten
-    tag_ancestors = tags.map {|e| Node.tag_ancestors_of(e.name)}.flatten
-    semantic_tag_ancestors = semantic_ancestors.map {|e| Node.tag_ancestors_of(e)}.flatten
-    (semantic_ancestors + tag_ancestors + semantic_tag_ancestors).uniq
+    aoa = tags.map {|e| [e.name, Node.extra_tags(e.name)]}
+    p aoa
+    aoa.map {|e| e[1]}.flatten.uniq
   end
   
   def all_tags
