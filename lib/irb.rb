@@ -4,10 +4,11 @@ require 'pp'
 module ConsoleExtensions
   def self.included(base)
     base.class_eval %[
-      named_scope :find_by_regexp, lambda {|c,v| {:conditions=>['? REGEXP ?', c, v]}}
+      named_scope :find_by_regexp, lambda {|c,v| {:conditions=>[c + " REGEXP ?", v]}}
       def self.find_name_by_regexp(v); find_by_regexp('name', v); end
       class <<self
-        alias_method :fr, :find_name_by_regexp
+        alias_method :rn, :find_name_by_regexp
+        alias_method :fr, :find_by_regexp
       end
     ]
   end
@@ -41,6 +42,7 @@ Url.class_eval %[
   alias_method :t, :tag_and_save
   alias_method :ta, :tag_add_and_save
   alias_method :tr, :tag_remove_and_save
+  alias_method :tar, :tag_add_and_remove
   alias_method :tl, :tag_list
   class<<self
     alias_method :t, :used_tags
@@ -66,6 +68,7 @@ Node.class_eval %[
   alias_method :fd, :find_descendant
   alias_method :dl, :descendants_by_level
   alias_method :pn, :parent_names
+  alias_method :cc, :create_child_node
   alias_method :ln, :leaf_names
   class<<self
     alias_method :s, :semantic_names

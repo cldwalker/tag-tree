@@ -233,6 +233,12 @@ class Node < ActiveRecord::Base
   #   end
   # end
   
+  def create_child_node(name)
+    node = self.class.create(:name=>name.to_s)
+    node.move_to_child_of self.id
+    puts self.to_otl
+  end
+  
   #TODO: merge this with create_node_under()
   #From any tree
   def add_tag(tag, options={})
@@ -330,6 +336,11 @@ class Node < ActiveRecord::Base
   end
   
   class <<self
+    def change_word(old_word, new_word)
+      Url.find_and_change_tag(old_word, new_word)
+      update_all(["name = ?", new_word], ["name = ?", old_word])
+    end
+    
     def semantic_words_unique? 
       semantic_words = nonsemantic_tree.descendant_names  + semantic_tree.descendant_names
       semantic_words.size == semantic_words.uniq.size
@@ -376,13 +387,12 @@ class Node < ActiveRecord::Base
       end
     end
     
-    def create_node_under(parent_node, new_name, parent_name)
+    def create_node_under(parent_node, new_name, parent_name=nil)
       if parent_node
-        node = create(:name=>new_name.to_s)
-        node.move_to_child_of parent_node.id
-        puts parent_node.to_otl
+        parent_node.create_child_node(new_name)
       else
-        puts "Parent node '#{parent_name}' not found"
+        message = parent_name ? "Parent node '#{parent_name}' not found" : "Parent node not found"
+        puts message
       end
     end
     
@@ -393,13 +403,27 @@ class Node < ActiveRecord::Base
       args.each {|e| create_node_under(parent_node, e, parent_name) }
     end
     
-    def create_semantic_node_under(new_name, parent_name)
-      parent_node = semantic_node(parent_name)
-      create_node_under(parent_node, new_name, parent_name)
+    def create_semantic_node_under(new_name, parent_name=nil)
+      if parent_name
+        parent_node = semantic_node(parent_name)
+        create_node_under(parent_node, new_name, parent_name)
+      else
+        semantic_root = semantic_tree
+        create_node_under(semantic_root, new_name, semantic_root.name)
+      end
     end
     
     def create_tag_node_under(new_name, parent_name)
       parent_node = tag_node(parent_name)
+      create_node_under(parent_node, new_name, parent_name)
+    end
+    
+    def create_tag_node_and_parent_node(new_name, parent_name)
+      parent_node = tag_node(parent_name)
+      if parent_node.nil?
+        parent_node = create(:name=>tag)
+        parent_node.move_to_child_of tag_tree.root.id
+      end
       create_node_under(parent_node, new_name, parent_name)
     end
     
@@ -451,11 +475,14 @@ class Node < ActiveRecord::Base
     end
 
     def status(name)
-      puts "Semantic:"
       if (node = semantic_node(name))
+        puts "Semantic:"
+        node.smart_tree
+      elsif (node = nonsemantic_node(name))
+        puts "Nonsemantic:"
         node.smart_tree
       else
-        puts "Not found"
+        puts "Semantic: not found"
       end
       if (node = tag_node(name))
         puts "#{node.tags.length} Tags: #{node.tag_names.join(', ')}"

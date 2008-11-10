@@ -87,9 +87,22 @@ class Url < ActiveRecord::Base
       end
       unused
     end
+    
+    def find_and_change_tag(old_tag, new_tag)
+      results = find_tagged_with(old_tag)
+      results.each {|e| e.tag_add_and_remove(new_tag, old_tag)}
+      puts "Changed tag for #{results.length} records"
+    end
   end
   
   def tag_names; tags.map(&:name); end
+  
+  def tag_add_and_remove(add_list, remove_list)
+    self.class.transaction do
+      tag_add_and_save(add_list)
+      tag_remove_and_save(remove_list)
+    end
+  end
   
   def tag_add_and_save(tag_list)
     self.tag_list = self.tag_list.add(tag_list, :parse=>true).to_s
