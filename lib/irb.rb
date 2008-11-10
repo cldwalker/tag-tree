@@ -1,19 +1,41 @@
 #this file contains handy methods and aliases to be used from the console
 require 'pp'
 
-U = Url
-Tr = Tree
-T = Tag
-N = Node
+module ConsoleExtensions
+  def self.included(base)
+    base.class_eval %[
+      named_scope :find_by_regexp, lambda {|c,v| {:conditions=>['? REGEXP ?', c, v]}}
+      def self.find_name_by_regexp(v); find_by_regexp('name', v); end
+      class <<self
+        alias_method :fr, :find_name_by_regexp
+      end
+    ]
+  end
+end
 
 ActiveRecord::Base.class_eval %[
   alias_method :ua, :update_attribute  
   class<<self
+    def inherited(child)
+      super
+      child.class_eval do
+        include ConsoleExtensions
+      end
+    end
+    
     alias_method :f, :find
     alias_method :d, :destroy
   end
   def self.fn(*args); self.find_by_name(*args); end
 ]
+#since Tag was already defined by gems
+Tag.class_eval %[include ConsoleExtensions]
+
+AB = ActiveRecord::Base
+U = Url
+Tr = Tree
+T = Tag
+N = Node
 
 Url.class_eval %[
   alias_method :t, :tag_and_save

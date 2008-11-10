@@ -77,7 +77,7 @@ class Node < ActiveRecord::Base
     otl_to_array(self.to_otl)
   end
   
-  #option aliases:c=>:count, :r=>:result
+  #option aliases:c=>:count, :r=>:result, :e=>:extra_tags,:s=>:stats 
   def to_otl(max_level=nil, options={})
     if options[:c]
       tag_counts = Url.used_semantic_tag_counts(options[:c])
@@ -93,6 +93,26 @@ class Node < ActiveRecord::Base
           else
             "\n" + results.map{|e| otl_indent(node.level + 1) + e.to_console}.join("\n")
           end
+        else
+          ""
+        end
+      end
+    elsif options[:e]
+      build_otl(max_level) do |node|
+        extra_tags = Node.extra_tags(node.name)
+        extra_tags.empty? ? '' : " < #{extra_tags.join(', ')}"
+      end
+    elsif options[:s]
+      build_otl(max_level) do |node|
+        " (#{node.descendants.count}d, #{node.children.count}c)"
+      end
+    elsif options[:u]
+      build_otl(max_level) do |node|
+        used_tags = Url.used_tags(options[:u])
+        if used_tags.include?(node.name)
+          " X"
+        elsif !(descendants = Node.semantic_descendants_of(node.name).map(&:name) & used_tags).empty?
+          " > #{descendants.join(', ')} X"
         else
           ""
         end
@@ -343,6 +363,14 @@ class Node < ActiveRecord::Base
     def semantic_ancestors_of(name)
       if (node = semantic_node(name))
         node.semantic_ancestors
+      else
+        []
+      end
+    end
+    
+    def semantic_descendants_of(name)
+      if (node = semantic_node(name))
+        node.descendants
       else
         []
       end
