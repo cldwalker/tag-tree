@@ -1,81 +1,6 @@
-# require 'g/outline'
-
-# Provides parse_outlines() and create_parents_hash() for parsing
-# and build_otl() for generating outlines
-module OutlineParser
-  def parse_outlines(old_otl, new_otl)
-    old_otl_array = self.otl_to_array(old_otl)
-    new_otl_array = self.otl_to_array(new_otl)
-    new_ids = new_otl_array.map {|e| e[:id]}
-    delete_otl_array = old_otl_array.select {|e| !new_ids.include?(e[:id])}
-    return new_otl_array, delete_otl_array
-  end
-  
-  def otl_to_array(otl)
-    otl.split(record_separator).map {|e| string_to_otl_node(e) }
-  end
-  
-  def record_separator; "\n"; end
-  def indent_character; "\t"; end
-  
-  def otl_indent(indent_level); indent_character * indent_level; end
-  def string_to_otl_node(string)
-    string =~ /^(#{indent_character}+)?((\d+):)?\s*(.*)$/
-    {:id=>$3.to_i, :name=>$4, :level=>($1 ? $1.count(indent_character) : 0) }
-  end
-  #otl_node is a hash of node properties
-  def otl_node_to_string(otl_node)
-    otl_indent(otl_node[:level]) + "#{otl_node[:id]}: " + otl_node[:name] + record_separator
-  end
-  
-  #level array is an array of level to value arrays
-  def otl_to_level_array(otl)
-    nodes = otl_to_array(otl)
-    nodes.map {|e| [e[:level], e]}
-  end
-  
-  def create_parents_hash(otl_array)
-    p otl_array
-    hash = {}
-    parent = :root
-    otl_array.each_with_index do |node, i|
-      #NOTE: this condition could be node[:level] = 0 but than have to handle multiple roots ...
-      if i == 0
-        if node[:level] == 0
-          hash[node] = :root
-        else
-          raise "First node of outline should be root (level 0), instead this node is at level #{node[:level]}"
-        end
-      else
-        hash[node] = find_parent_in_otl_array(otl_array, i) or raise "didn't find parent for #{node.inspect}"
-      end
-    end
-    hash
-  end
-  
-  def find_parent_in_otl_array(otl_array, current_index)
-    possible_parents = otl_array.slice(0,current_index).reverse
-    for parent in possible_parents
-      return parent if parent[:level] < otl_array[current_index][:level]
-    end
-    nil
-  end  
-  
-  #assumes children() and to_otl_node() method for inheriting object
-  def build_otl(max_level, otl_level=0, &block)
-    otl = otl_node_to_string(self.to_otl_node)
-    if block_given?
-      otl = otl.chomp(record_separator) + yield(self) + record_separator
-    end
-    otl_level += 1
-    return otl if max_level && otl_level > max_level
-    self.children.each {|e| otl += e.build_otl(max_level,otl_level, &block) }
-    otl
-  end
-end
-
+require 'outline/console_editor'
 class Node < ActiveRecord::Base
-  include OutlineParser
+  include Outline::ConsoleEditor
   belongs_to :objectable, :polymorphic=>true
   acts_as_nested_set
   
@@ -99,13 +24,9 @@ class Node < ActiveRecord::Base
   #   end
   #   aoa
   # end
-  
-  # def to_otl_array
-  #   otl_to_array(self.to_otl)
-  # end
-  
+    
   def to_otl_node
-    {:level=>level, :id=>id, :name=>name}
+    {:level=>level, :id=>id, :text=>name}
   end
   
   #option aliases:c=>:count, :r=>:result, :e=>:extra_tags,:s=>:stats 
@@ -154,100 +75,6 @@ class Node < ActiveRecord::Base
   end
     
   def view_otl(*args); puts self.to_otl(*args); end
-  
-  def text_update
-    new_otl = self.class.edit_string(to_otl)
-    update_otl(new_otl)
-    self.to_otl
-  end
-  
-  def update_otl(new_otl)
-    new_otl_array, delete_otl_array = parse_outlines(self.to_otl, new_otl)
-    # p ["ADD: ", new_otl_array]
-    p ["DELETE: ", delete_otl_array]
-    self.class.transaction do
-      new_otl_array = add_otl_nodes(new_otl_array)
-      parents_hash = create_parents_hash(new_otl_array)
-      # p parents_hash
-      new_root = parents_hash.invert[:root]
-      parents_hash.delete(new_root)
-      root_id = update_otl_root(new_root[:id], self.id)
-      update_otl_node_levels(parents_hash)
-      update_node_attributes(new_otl_array)
-      #update node order
-      # root = find(root_id)
-      # update_nodes_children_order(root)
-      
-      delete_otl_nodes(delete_otl_array)
-    end
-  end
-  
-  def add_otl_nodes(otl_array)
-    otl_array.map do |hash|
-      if hash[:id].zero? || hash[:id].blank?
-        obj = self.class.create(:name=>hash[:name])
-        puts "Created node #{obj.id}"
-        hash.merge(:id=>obj.id)
-      else
-        hash
-      end
-    end
-  end
-  
-  def update_node_attributes(otl_array)
-    otl_array.each do |e|
-      node = self.class.find(e[:id])
-      if node.name != e[:name]
-        node.update_attribute :name, e[:name]
-        puts "Updated node name for node #{node.id}"
-      end
-      # unless (tag = node.objectable) && tag.name == e[:name]
-      #   node.objectable = Tag.find_or_create_by_name(e[:name])
-      #   node.save
-      #   puts "Synchronizing tag with node #{node.id}"
-      # end
-    end
-  end
-  
-  def update_otl_root(new_root, old_root)
-    if new_root != old_root
-      self.class.find(new_root).move_to_root
-      puts "Set node #{new_root} as root"
-      new_root
-    else
-      old_root
-    end
-  end
-  
-  def update_otl_node_levels(parents_hash)
-    #update existing nodes to correct parent
-    parents_hash.each do |hash, parent|
-      node = self.class.find(hash[:id])
-      if node.parent_id != parent[:id]
-        node.move_to_child_of(parent[:id]) 
-        puts "Moved node #{node.id} to parent #{parent[:id]}"
-      end
-    end
-  end
-  
-  def delete_otl_nodes(delete_otl_array)
-    delete_otl_array.each {|e| 
-      if (node = self.class.find_by_id(e[:id]))
-        node.destroy
-        puts "Deleted node #{e[:id]}"
-      end
-    }
-  end
-  
-  # def update_node_order_with_children_hash(current_node, children_hash)
-  #   update_node_order_for_level_array
-  #   children = node.children
-  # end
-  # 
-  # def children_hash_for_level_array(level_array)
-  #   level_array.each_with_index do |e, i|
-  #   end
-  # end
   
   def create_child_node(name)
     node = self.class.create(:name=>name.to_s)

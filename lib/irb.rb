@@ -83,6 +83,7 @@ Node.class_eval %[
 def ns; Node.nonsemantic_tree; end
 def s; Node.semantic_tree; end
 def t; Node.tag_tree; end
+def t2; Node.find_by_name('tags2'); end
 
 def st(name)
   Node.status(name)
