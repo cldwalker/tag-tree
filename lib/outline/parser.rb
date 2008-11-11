@@ -1,6 +1,9 @@
 
-# Provides parse_outlines() and create_parents_hash() for parsing
-# and build_otl() for generating outlines
+# This module provides parse_outlines() and create_parents_hash() for outline parsing
+# and build_outline() for generating outlines.
+# To be usable this module needs to be included and have string_to_outline_node()
+# and outline_node_to_string() overriden.
+# build_outline() has its own interface expectations.
 module Outline
   module Parser
   def parse_outlines(old_otl, new_otl)
@@ -12,21 +15,16 @@ module Outline
   end
   
   def otl_to_array(otl)
-    otl.split(record_separator).map {|e| string_to_otl_node(e) }
+    otl.split(record_separator).map {|e| string_to_outline_node(e) }
   end
   
   def record_separator; "\n"; end
   def indent_character; "\t"; end
+  def outline_indent(indent_level); indent_character * indent_level; end
   
-  def otl_indent(indent_level); indent_character * indent_level; end
-  def string_to_otl_node(string)
-    string =~ /^(#{indent_character}+)?((\d+):)?\s*(.*)$/
-    {:id=>$3.to_i, :text=>$4, :level=>($1 ? $1.count(indent_character) : 0) }
-  end
-  #otl_node is a hash of node properties
-  def otl_node_to_string(otl_node)
-    otl_indent(otl_node[:level]) + "#{otl_node[:id]}: " + otl_node[:text] + record_separator
-  end
+  def string_to_outline_node(string); raise "This abstract method needs to be overriden."; end
+  #should return a hash with :level, :text and :id keys
+  def outline_node_to_string(otl_node); raise "This abstract method needs to be overriden."; end
   
   #level array is an array of level to value arrays
   def otl_to_level_array(otl)
@@ -35,7 +33,7 @@ module Outline
   end
   
   def create_parents_hash(otl_array)
-    p otl_array
+    # logger.debug "PARENTS:" + otl_array.inspect
     hash = {}
     parent = :root
     otl_array.each_with_index do |node, i|
@@ -61,15 +59,15 @@ module Outline
     nil
   end  
   
-  #assumes children() and to_otl_node() method for inheriting object
-  def build_otl(max_level=nil, otl_level=0, &block)
-    otl = otl_node_to_string(self.to_otl_node)
+  #assumes inheriting object has children() and to_outline_node() methods
+  def build_outline(max_level=nil, otl_level=0, &block)
+    otl = outline_node_to_string(self.to_outline_node)
     if block_given?
       otl = otl.chomp(record_separator) + yield(self) + record_separator
     end
     otl_level += 1
     return otl if max_level && otl_level > max_level
-    self.children.each {|e| otl += e.build_otl(max_level,otl_level, &block) }
+    self.children.each {|e| otl += e.build_outline(max_level,otl_level, &block) }
     otl
   end
   end

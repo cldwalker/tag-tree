@@ -69,3 +69,4 @@ Rails::Initializer.run do |config|
 end
 
 Tag.class_eval %[include TagHelper]
+# ENV["EDITOR"] = "vim -c 'setf vo_base'"

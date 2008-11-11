@@ -56,7 +56,7 @@ Url.class_eval %[
 ]
 
 Node.class_eval %[
-  def u; puts self.text_update; end
+  def u; puts self.outline_update; end
   alias_method :vo, :view_otl
   alias_method :tn, :tag_names
   alias_method :tbn, :tagged_by_names

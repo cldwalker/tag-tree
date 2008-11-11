@@ -1,4 +1,5 @@
 require 'outline/console_editor'
+
 class Node < ActiveRecord::Base
   include Outline::ConsoleEditor
   belongs_to :objectable, :polymorphic=>true
@@ -12,20 +13,7 @@ class Node < ActiveRecord::Base
   #this name is misleading, words would've been better
   TAG_ROOT = 'tags'
   
-  #currently get [[5, [6, [8]], [7]]] but should be [[5, [[6, 8], 7]]]
-  # def to_aoa
-  #   aoa = []
-  #   if self.children.empty?
-  #     aoa << self.id
-  #   else
-  #     aoa = [self.id]
-  #     child_aoa = self.children.map(&:to_aoa)
-  #     aoa << child_aoa
-  #   end
-  #   aoa
-  # end
-    
-  def to_otl_node
+  def to_outline_node
     {:level=>level, :id=>id, :text=>name}
   end
   
@@ -33,33 +21,33 @@ class Node < ActiveRecord::Base
   def to_otl(max_level=nil, options={})
     if options[:c]
       tag_counts = Url.used_semantic_tag_counts(options[:c])
-      build_otl(max_level) do |node|
+      build_outline(max_level) do |node|
         tag_counts[node.name] ? " (#{tag_counts[node.name]})" : ""
       end
     elsif options[:r]
-      build_otl(max_level) do |node|
+      build_outline(max_level) do |node|
         if node.leaf?
           results = Url.semantic_tagged_with(node.name, :id=>options[:r])
           if results.empty?
             ""
           else
-            "\n" + results.map{|e| otl_indent(node.level + 1) + e.to_console}.join("\n")
+            "\n" + results.map{|e| outline_indent(node.level + 1) + e.to_console}.join("\n")
           end
         else
           ""
         end
       end
     elsif options[:e]
-      build_otl(max_level) do |node|
+      build_outline(max_level) do |node|
         extra_tags = Node.extra_tags(node.name)
         extra_tags.empty? ? '' : " < #{extra_tags.join(', ')}"
       end
     elsif options[:s]
-      build_otl(max_level) do |node|
+      build_outline(max_level) do |node|
         " (#{node.descendants.count}d, #{node.children.count}c)"
       end
     elsif options[:u]
-      build_otl(max_level) do |node|
+      build_outline(max_level) do |node|
         used_tags = Url.used_tags(options[:u])
         if used_tags.include?(node.name)
           " X"
@@ -70,7 +58,7 @@ class Node < ActiveRecord::Base
         end
       end
     else
-      build_otl(max_level)
+      build_outline(max_level)
     end
   end
     
@@ -343,36 +331,44 @@ class Node < ActiveRecord::Base
         ns_tags = tag_tree.find_descendants(*ns_tags).select {|e| e.level > 1 }.map(&:name)
       end
       ns_tags.uniq
-    end
-    
-    def update_otl(root_id, new_otl)
-      find(root_id).update_otl(new_otl)
-    end
-    
-    
-    # def otl_to_aoa(otl)
-    #   nodes = otl_to_array(otl)
-    #   aoa = []
-    #   child_aoa = []
-    #   nodes.each_with_index do |e, i|
-    #     #has children
-    #     if nodes[i+1] && nodes[i+1][:level] > e[:level]
-    #       aoa << [ e.id, get_otl_children(e)]
-    #     else
-    #       aoa << e.id
-    #     end
-    #   end
-    #   aoa
-    # end
-    
-  
+    end    
   end
   
 end
 
 __END__
 
-#Assuming many trees
+####failed aoa conversions####
+#require 'g/outline'
+#currently get [[5, [6, [8]], [7]]] but should be [[5, [[6, 8], 7]]]
+# def to_aoa
+#   aoa = []
+#   if self.children.empty?
+#     aoa << self.id
+#   else
+#     aoa = [self.id]
+#     child_aoa = self.children.map(&:to_aoa)
+#     aoa << child_aoa
+#   end
+#   aoa
+# end
+# def self.otl_to_aoa(otl)
+#   nodes = otl_to_array(otl)
+#   aoa = []
+#   child_aoa = []
+#   nodes.each_with_index do |e, i|
+#     #has children
+#     if nodes[i+1] && nodes[i+1][:level] > e[:level]
+#       aoa << [ e.id, get_otl_children(e)]
+#     else
+#       aoa << e.id
+#     end
+#   end
+#   aoa
+# end
+  
+
+####Assuming many trees####
   #nodes with same name
   def clones
     unless @clones
@@ -387,7 +383,7 @@ __END__
   def clone_trees; self.clones.map(&:root); end
 
 
-###Later: TafelTree view methods
+###Later: TafelTree view methods#####
 def to_ttree
   tree = []
   tree << build_ttree_node(tree)
@@ -430,3 +426,16 @@ def parse_level(nodes, parent, hash)
     parse_level(e['items'],e['id'],hash) if e['items']
   end
 end
+
+###Possible console editor enhancement####
+# def update_node_attributes(otl_array)
+  #super
+  # otl_array.each do |e|
+  #   node = self.class.find(e[:id])
+    # unless (tag = node.objectable) && tag.name == e[:text]
+    #   node.objectable = Tag.find_or_create_by_name(e[:text])
+    #   node.save
+    #   console_message "Synchronizing tag with node #{node.id}"
+    # end
+#   end
+# end

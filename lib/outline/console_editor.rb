@@ -1,42 +1,45 @@
-require 'outline/parser'
+require 'outline/node_parser'
 
 # depends on methods from Outline::Parser and
 # following tree methods: move_to_root() and move_to_child_of()
 module Outline
   module ConsoleEditor
-  include Outline::Parser
-  #change to your own editor
-  def my_editor
-    "vim -c 'setf vo_base'"
+  include Outline::NodeParser
+  
+  def outline_editor
+    ENV["EDITOR"]
   end
+  
   def edit_string(string)
     require 'tempfile'
     tempfile = Tempfile.new('edit')
     File.open(tempfile.path,'w') {|f| f.write(string) }
-    system("#{my_editor} #{tempfile.path}")
+    system("#{outline_editor} #{tempfile.path}")
     File.read(tempfile.path)
   end
   
-  def text_update
-    new_otl = edit_string(build_otl)
+  def outline_update
+    new_otl = edit_string(self.build_outline)
     update_otl(new_otl)
-    self.build_otl
+    self.build_outline
+  end
+  
+  def console_message(*args)
+    puts(*args)
   end
   
   def update_otl(new_otl)
-    new_otl_array, delete_otl_array = parse_outlines(self.build_otl, new_otl)
-    # p ["ADD: ", new_otl_array]
-    p ["DELETE: ", delete_otl_array]
+    new_otl_array, delete_otl_array = parse_outlines(self.build_outline, new_otl)
+    # logger.debug ["DELETE: ", delete_otl_array].inspect
     self.class.transaction do
       new_otl_array = add_otl_nodes(new_otl_array)
       parents_hash = create_parents_hash(new_otl_array)
-      # p parents_hash
       new_root = parents_hash.invert[:root]
       parents_hash.delete(new_root)
       root_id = update_otl_root(new_root[:id], self.id)
       update_otl_node_levels(parents_hash)
       update_node_attributes(new_otl_array)
-      #update node order
+      #TODO: update node order
       # root = find(root_id)
       # update_nodes_children_order(root)
       
@@ -48,7 +51,7 @@ module Outline
     otl_array.map do |hash|
       if hash[:id].zero? || hash[:id].blank?
         obj = self.class.create(:name=>hash[:text])
-        puts "Created node #{obj.id}"
+        console_message "Created node #{obj.id} with text '#{hash[:text]}'"
         hash.merge(:id=>obj.id)
       else
         hash
@@ -61,20 +64,15 @@ module Outline
       node = self.class.find(e[:id])
       if node.name != e[:text]
         node.update_attribute :name, e[:text]
-        puts "Updated node name for node #{node.id}"
+        console_message "Changed text of node #{node.id} to '#{e[:text]}'"
       end
-      # unless (tag = node.objectable) && tag.name == e[:text]
-      #   node.objectable = Tag.find_or_create_by_name(e[:text])
-      #   node.save
-      #   puts "Synchronizing tag with node #{node.id}"
-      # end
     end
   end
   
   def update_otl_root(new_root, old_root)
     if new_root != old_root
       self.class.find(new_root).move_to_root
-      puts "Set node #{new_root} as root"
+      console_message "Set node #{new_root} as root"
       new_root
     else
       old_root
@@ -87,7 +85,7 @@ module Outline
       node = self.class.find(hash[:id])
       if node.parent_id != parent[:id]
         node.move_to_child_of(parent[:id]) 
-        puts "Moved node #{node.id} to parent #{parent[:id]}"
+        console_message "Moved node #{node.id} under parent #{parent[:id]}"
       end
     end
   end
@@ -96,7 +94,7 @@ module Outline
     delete_otl_array.each {|e| 
       if (node = self.class.find_by_id(e[:id]))
         node.destroy
-        puts "Deleted node #{e[:id]}"
+        console_message "Deleted node #{e[:id]}"
       end
     }
   end
