@@ -1,5 +1,7 @@
-require 'g/outline'
+# require 'g/outline'
 
+# Provides parse_outlines() and create_parents_hash() for parsing
+# and build_otl() for generating outlines
 module OutlineParser
   def parse_outlines(old_otl, new_otl)
     old_otl_array = self.otl_to_array(old_otl)
@@ -10,7 +12,20 @@ module OutlineParser
   end
   
   def otl_to_array(otl)
-    otl.split("\n").map {|e| e =~ /^(\t+)?((\d+):)?\s*(.*)$/; {:id=>$3.to_i, :name=>$4, :level=>($1 ? $1.count("\t") : 0) } }
+    otl.split(record_separator).map {|e| string_to_otl_node(e) }
+  end
+  
+  def record_separator; "\n"; end
+  def indent_character; "\t"; end
+  
+  def otl_indent(indent_level); indent_character * indent_level; end
+  def string_to_otl_node(string)
+    string =~ /^(#{indent_character}+)?((\d+):)?\s*(.*)$/
+    {:id=>$3.to_i, :name=>$4, :level=>($1 ? $1.count(indent_character) : 0) }
+  end
+  #otl_node is a hash of node properties
+  def otl_node_to_string(otl_node)
+    otl_indent(otl_node[:level]) + "#{otl_node[:id]}: " + otl_node[:name] + record_separator
   end
   
   #level array is an array of level to value arrays
@@ -45,6 +60,18 @@ module OutlineParser
     end
     nil
   end  
+  
+  #assumes children() and to_otl_node() method for inheriting object
+  def build_otl(max_level, otl_level=0, &block)
+    otl = otl_node_to_string(self.to_otl_node)
+    if block_given?
+      otl = otl.chomp(record_separator) + yield(self) + record_separator
+    end
+    otl_level += 1
+    return otl if max_level && otl_level > max_level
+    self.children.each {|e| otl += e.build_otl(max_level,otl_level, &block) }
+    otl
+  end
 end
 
 class Node < ActiveRecord::Base
@@ -54,7 +81,7 @@ class Node < ActiveRecord::Base
   
   #tree which stores is-a relationships between words
   SEMANTIC_ROOT = 'semantic'
-  #branch for words that are semantic bastards
+  #tree which stores words that haven't made it to semantic tree
   NONSEMANTIC_ROOT = 'nonsemantic'
   #tree which stores categorical/hierarchial relationship between words
   #this name is misleading, words would've been better
@@ -73,8 +100,12 @@ class Node < ActiveRecord::Base
   #   aoa
   # end
   
-  def to_otl_array
-    otl_to_array(self.to_otl)
+  # def to_otl_array
+  #   otl_to_array(self.to_otl)
+  # end
+  
+  def to_otl_node
+    {:level=>level, :id=>id, :name=>name}
   end
   
   #option aliases:c=>:count, :r=>:result, :e=>:extra_tags,:s=>:stats 
@@ -122,22 +153,7 @@ class Node < ActiveRecord::Base
     end
   end
     
-  def build_otl(max_level, otl_level=0, &block)
-    otl = self.to_otl_node
-    if block_given?
-      otl = otl.chomp + yield(self) + "\n"
-    end
-    otl_level += 1
-    return otl if max_level && otl_level > max_level
-    self.children.each {|e| otl += e.build_otl(max_level,otl_level, &block) }
-    otl
-  end
-  
   def view_otl(*args); puts self.to_otl(*args); end
-  def otl_indent(indent_level); "\t" * indent_level; end
-  def to_otl_node
-    otl_indent(level) + "#{self.id}: " + self.name + "\n"
-  end
   
   def text_update
     new_otl = self.class.edit_string(to_otl)
@@ -479,8 +495,7 @@ class Node < ActiveRecord::Base
         puts "Semantic:"
         node.smart_tree
       elsif (node = nonsemantic_node(name))
-        puts "Nonsemantic:"
-        node.smart_tree
+        puts "Nonsemantic #{node.parent.name}"
       else
         puts "Semantic: not found"
       end
