@@ -249,10 +249,12 @@ class Node < ActiveRecord::Base
       create_node_under(parent_node, new_name, parent_name)
     end
     
+    #?: replace create_tag_node_under
     def create_tag_node_and_parent_node(new_name, parent_name)
+      parent_name = parent_name.to_s
       parent_node = tag_node(parent_name)
       if parent_node.nil?
-        parent_node = create(:name=>tag)
+        parent_node = create(:name=>parent_name)
         parent_node.move_to_child_of tag_tree.root.id
       end
       create_node_under(parent_node, new_name, parent_name)

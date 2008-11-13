@@ -75,7 +75,7 @@ Node.class_eval %[
     alias_method :t, :tag_names
     alias_method :cn, :create_nonsemantic_node
     alias_method :cs, :create_semantic_node_under
-    alias_method :ct, :create_tag_node_under
+    alias_method :ct, :create_tag_node_and_parent_node
     alias_method :r, :rebuild!
   end
 ]
@@ -117,9 +117,13 @@ def o(*url_ids)
 end
 
 #url-paged
-def up(offset=0, limit=20)
+def up(offset=nil, limit=20)
   columns = [:id, :name, :tag_names]
-  uf(offset, limit).amap(*columns)
+  #only set if an offset is given
+  if offset
+    @url_results = uf(offset, limit).amap(*columns)
+  end
+  pp @url_results
 end
 
 #url-find
@@ -127,11 +131,11 @@ def uf(offset=0, limit=20)
   Url.find(:all, :offset=>offset, :limit=>limit)
 end
 
-#urls-tagged
+#urls-tagged, already formatted
 def ut(*args)
   tag = args.shift
   args = [:id, :name, :tag_names] if args.empty?
-  Url.find_tagged_with(tag).amap(*args)
+  pp Url.find_tagged_with(tag).amap(*args)
 end
 
 class Array
