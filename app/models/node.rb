@@ -172,9 +172,9 @@ class Node < ActiveRecord::Base
       update_all(["name = ?", new_word], ["name = ?", old_word])
     end
     
-    def semantic_words_unique? 
+    def check_semantic_words 
       semantic_words = nonsemantic_tree.descendant_names  + semantic_tree.descendant_names
-      semantic_words.size == semantic_words.uniq.size
+      semantic_words.count_hash.select {|k,v| v > 1}.map {|e| e[0]}
     end
     
     def nonsemantic_tree

@@ -39,6 +39,8 @@ T = Tag
 N = Node
 
 Url.class_eval %[
+  alias_method :f, :facet_type_and_save
+  alias_method :fl, :facet_type_list
   alias_method :t, :tag_and_save
   alias_method :ta, :tag_add_and_save
   alias_method :tr, :tag_remove_and_save
@@ -118,7 +120,7 @@ end
 
 #url-paged
 def up(offset=nil, limit=20)
-  columns = [:id, :name, :tag_names]
+  columns = [:id, :name, :tag_list, :facet_type_list]
   #only set if an offset is given
   if offset
     @url_results = uf(offset, limit).amap(*columns)

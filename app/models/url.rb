@@ -1,5 +1,5 @@
 class Url < ActiveRecord::Base
-  acts_as_taggable_on :tags
+  acts_as_taggable_on :tags, :facet_types
   validates_presence_of :name
   validates_uniqueness_of :name
   
@@ -52,6 +52,19 @@ class Url < ActiveRecord::Base
       used_semantic_tag_counts(max_id).to_a.sort {|a,b| b[1]<=>a[1] }
     end
     
+    def facet_stats(url_array)
+      total_records = url_array.length
+      facets = url_array.map {|e| e.extra_tags(true) }.flatten
+      total_facets = facets.size
+      facet_hash = facets.count_hash
+      puts "FACET STATS for #{total_records} records, #{total_facets} facets (#{facets.uniq.size} unique)\nPercentages are calculated per total facets and total records\n\n"
+      facet_hash.each do |facet, count|
+        facet_percent = sprintf('%.0f', count /total_facets.to_f * 100)
+        record_percent = sprintf('%.0f', count/ total_records.to_f * 100)
+        puts %[#{facet}: #{facet_percent}% / #{record_percent}%]
+      end
+    end
+    
     #should be none
     def used_but_not_semantic(max_id, options={})
       arr = used_tags(max_id) - Node.semantic_names
@@ -69,13 +82,17 @@ class Url < ActiveRecord::Base
       used - used_semantically - tag_node_names
     end
     
+    def tags_to_tag
+      [:location, :learning_type, :td, :site, :site_type, :lang]
+    end
+    
     def used_to_tag(max_id, options={})
       words_to_tag = used_but_not_tagged(max_id)
       #eventually include once I can relate verbs + adj to nouns
       derivational = (Node.nonsemantic_tree.descendants -  Node.nonsemantic_node(:noun).descendants).map(&:name)
       #location is one of five top levels
-      location = Node.semantic_node(:location).descendants.map(&:name)
-      words_to_tag - location - derivational
+      td_tag_descendants = tags_to_tag.map {|e| Node.semantic_node(e).descendants.map(&:name) }.flatten
+      words_to_tag - td_tag_descendants - derivational
     end
     
     #shows parents + predicted semantic nodes
@@ -97,7 +114,7 @@ class Url < ActiveRecord::Base
   
   def tag_names; tags.map(&:name); end
   
-  def tag_add_and_remove(add_list, remove_list)
+  def tag_add_and_remove(remove_list, add_list)
     self.class.transaction do
       tag_add_and_save(add_list)
       tag_remove_and_save(remove_list)
@@ -121,9 +138,14 @@ class Url < ActiveRecord::Base
     self.save
   end
   
-  def extra_tags
+  def facet_type_and_save(ftype_list)
+    self.facet_type_list = ftype_list
+    self.save
+  end
+  
+  def extra_tags(verbose=false)
     aoa = tags.map {|e| [e.name, Node.extra_tags(e.name)]}
-    p aoa
+    puts  "#{id}: #{aoa.inspect}" if verbose
     aoa.map {|e| e[1]}.flatten.uniq
   end
   
