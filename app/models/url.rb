@@ -4,6 +4,17 @@ class Url < ActiveRecord::Base
   validates_uniqueness_of :name
   
   class<<self
+    def quick_create(string)
+      name, description, tags = string.split(",,")
+      create_hash = {:name=>name}
+      if tags.nil?
+        create_hash[:tag_list] = description
+      else
+        create_hash[:description] = description
+        create_hash[:tag_list] = tags
+      end
+      create(create_hash)
+    end
     #looks up semantic 
     def semantic_tagged_with(tags, options={})
       children = (parent = Node.semantic_node(tags)) ? parent.descendants.map(&:name) : []
@@ -107,7 +118,7 @@ class Url < ActiveRecord::Base
     
     def find_and_change_tag(old_tag, new_tag)
       results = find_tagged_with(old_tag)
-      results.each {|e| e.tag_add_and_remove(new_tag, old_tag)}
+      results.each {|e| e.tag_add_and_remove(old_tag, new_tag)}
       puts "Changed tag for #{results.length} records"
     end
   end

@@ -25,6 +25,7 @@ ActiveRecord::Base.class_eval %[
     end
     
     alias_method :f, :find
+    alias_method :[], :find
     alias_method :d, :destroy
   end
   def self.fn(*args); self.find_by_name(*args); end
@@ -91,8 +92,12 @@ def st(name)
   Node.status(name)
 end
 
+def trn(name)
+  Tag.find_name_by_regexp(name.to_s)
+end
+
 def tn(name)
-  Node.tag_node(name)
+  Tag.find_by_name(name.to_s)
 end
 
 def tvo(*args)
@@ -138,6 +143,10 @@ def ut(*args)
   tag = args.shift
   args = [:id, :name, :tag_names] if args.empty?
   pp Url.find_tagged_with(tag).amap(*args)
+end
+
+def uc(string)
+  Url.quick_create(string)
 end
 
 class Array
