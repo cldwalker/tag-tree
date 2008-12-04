@@ -13,4 +13,4 @@
   
   1. Install necessary gems: `rake gems:install`
   2. Copy config/database.yml.example to config/database.yml and setup your db.
-  2. Run migrations: `rake db:migrate`
+  3. Run migrations: `rake db:migrate`
