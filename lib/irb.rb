@@ -25,62 +25,19 @@ ActiveRecord::Base.class_eval %[
     end
     
     alias_method :f, :find
-    alias_method :[], :find
-    alias_method :d, :destroy
   end
   def self.fn(*args); self.find_by_name(*args); end
 ]
 #since Tag was already defined by gems
 Tag.class_eval %[include ConsoleExtensions]
 
-AB = ActiveRecord::Base
-U = Url
-Tr = Tree
-T = Tag
-N = Node
-
-Url.class_eval %[
-  alias_method :f, :facet_type_and_save
-  alias_method :fl, :facet_type_list
-  alias_method :t, :tag_and_save
-  alias_method :ta, :tag_add_and_save
-  alias_method :tr, :tag_remove_and_save
-  alias_method :tar, :tag_add_and_remove
-  alias_method :tl, :tag_list
-  class<<self
-    alias_method :t, :used_tags
-    alias_method :ts, :tag_stats
-    alias_method :us, :used_but_not_semantic
-    alias_method :ut, :used_to_tag
-    alias_method :tr, :tags_related
-    alias_method :ftw, :find_tagged_with
-    alias_method :stw, :semantic_tagged_with
-  end
-]
+#using local for now
+$:.unshift "/home/bozo/code/gems/alias/lib"
+require 'alias' #sudo gem install cldwalker-alias
+Alias.init
 
 Node.class_eval %[
   def u; puts self.outline_update; end
-  alias_method :vo, :view_otl
-  alias_method :tn, :tag_names
-  alias_method :tbn, :tagged_by_names
-  alias_method :tt, :tag_trees
-  alias_method :tbt, :tagged_by_trees
-  alias_method :d, :descendants
-  alias_method :dn, :descendant_names
-  alias_method :fds, :find_descendants
-  alias_method :fd, :find_descendant
-  alias_method :dl, :descendants_by_level
-  alias_method :pn, :parent_names
-  alias_method :cc, :create_child_node
-  alias_method :ln, :leaf_names
-  class<<self
-    alias_method :s, :semantic_names
-    alias_method :t, :tag_names
-    alias_method :cn, :create_nonsemantic_node
-    alias_method :cs, :create_semantic_node_under
-    alias_method :ct, :create_tag_node_and_parent_node
-    alias_method :r, :rebuild!
-  end
 ]
 
 def ns; Node.nonsemantic_tree; end
