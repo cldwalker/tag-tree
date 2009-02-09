@@ -15,7 +15,6 @@ module ConsoleExtensions
 end
 
 ActiveRecord::Base.class_eval %[
-  alias_method :ua, :update_attribute  
   class<<self
     def inherited(child)
       super
@@ -26,14 +25,24 @@ ActiveRecord::Base.class_eval %[
     
     alias_method :f, :find
   end
+  
+  require 'abbrev'
+  def rua(name, value)
+    if name = self.class.column_names.abbrev[name.to_s]
+      update_attribute(name, value)
+    else
+      puts "'\#{name}' doesn't match a column"
+    end
+  end
+
   def self.fn(*args); self.find_by_name(*args); end
 ]
 #since Tag was already defined by gems
 Tag.class_eval %[include ConsoleExtensions]
 
 #using local for now
-$:.unshift "/home/bozo/code/gems/alias/lib"
-require 'alias' #sudo gem install cldwalker-alias
+require 'local_gem' # gem install cldwalker-local_gem
+LocalGem.local_require 'alias' # gem install cldwalker-alias
 Alias.init
 
 Node.class_eval %[

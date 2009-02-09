@@ -28,6 +28,8 @@ instance_method:
     parent_names: pn
     create_child_node: cc
     leaf_names: ln
+  ActiveRecord::Base:
+    update_attribute: ua
 
 class_method:
   Url:
