@@ -68,6 +68,7 @@ Rails::Initializer.run do |config|
   # config.active_record.observers = :cacher, :garbage_collector
 end
 
-#TODO: add conditional for when taggable not installed
-Tag.class_eval %[include TagHelper]
+if Object.const_defined? :Tag
+  Tag.class_eval %[include TagHelper]
+end
 # ENV["EDITOR"] = "vim -c 'setf vo_base'"
