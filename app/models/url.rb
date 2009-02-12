@@ -1,5 +1,6 @@
 class Url < ActiveRecord::Base
-  acts_as_taggable_on :tags, :facet_types
+  has_machine_tags
+  # acts_as_taggable_on :tags, :facet_types
   validates_presence_of :name
   validates_uniqueness_of :name
   
@@ -132,14 +133,14 @@ class Url < ActiveRecord::Base
     end
   end
   
-  def tag_add_and_save(tag_list)
-    self.tag_list = self.tag_list.add(tag_list, :parse=>true).to_s
+  def tag_add_and_save(*add_list)
+    self.tag_list = self.tag_list + add_list
     self.save
     self.tag_list
   end
   
-  def tag_remove_and_save(tag_list)
-    self.tag_list = self.tag_list.remove(tag_list, :parse=>true).to_s
+  def tag_remove_and_save(*remove_list)
+    self.tag_list = self.tag_list - remove_list
     self.save
     self.tag_list
   end

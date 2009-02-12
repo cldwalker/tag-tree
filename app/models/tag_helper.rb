@@ -7,6 +7,9 @@ module TagHelper
   end
   
   module ClassMethods
+    def unused_tag_ids
+      find(:all, :select=>'id').map(&:id) - Tagging.find(:all, :select=>"distinct tag_id").map(&:tag_id)
+    end
   end
   
 end
