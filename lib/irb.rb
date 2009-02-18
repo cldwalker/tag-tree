@@ -83,6 +83,10 @@ def tags(id_or_name)
   node.tag_names
 end
 
+def change_tag(old_name, new_name)
+  Tag.find_by_name(old_name).update_attribute :name, new_name
+end
+
 #open url object id
 def o(*url_ids)
   urls = url_ids.map {|e| Url.find_by_id(e)}.compact.map {|e| "'#{e.name}'"}

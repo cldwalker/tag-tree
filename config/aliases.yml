@@ -32,13 +32,18 @@ instance_method:
     update_attribute: ua
 
 class_method:
+  Tag:
+    machine_tags: mt
+    namespace: nsp
+    tag_group: tg
   Url:
     used_tags: t
     tag_stats: ts
     used_but_not_semantic: us
     used_to_tag: ut
     tags_related: tr
-    find_tagged_with: ftw
+    tagged_with: tw
+    tagged_with_count: twc
     semantic_tagged_with: stw
   ActiveRecord::Base:
     find: '[]'
