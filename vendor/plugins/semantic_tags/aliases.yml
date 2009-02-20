@@ -1,0 +1,38 @@
+# for use with alias gem (gem installcldwalker-alias)
+constant:
+  Node:N
+instance_method:
+  Url:
+    facet_type_list: fl
+    facet_type_and_save: f
+  Node:
+    view_otl: vo
+    tag_names: tn
+    tagged_by_names: tbn
+    tag_trees: tt
+    tagged_by_trees: tbt
+    descendants: d
+    descendant_names: dn
+    find_descendants: fds
+    find_descendant: fd
+    descendants_by_level: dl
+    parent_names: pn
+    create_child_node: cc
+    leaf_names: ln
+
+class_method:
+  Url:
+    used_tags: t
+    tag_stats: ts
+    used_but_not_semantic: us
+    used_to_tag: ut
+    tags_related: tr
+    semantic_tagged_with: stw
+  Node:
+    semantic_names: s
+    tag_names: t
+    create_nonsemantic_node: cn
+    create_semantic_node_under: cs
+    create_tag_node_and_parent_node: ct
+    rebuild!: r
+  

@@ -26,7 +26,7 @@ Rails::Initializer.run do |config|
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "aws-s3", :lib => "aws/s3"
   # config.gem "mbleigh-acts-as-taggable-on", :source => "http://gems.github.com", :lib => "acts-as-taggable-on"
-  config.gem "collectiveidea-awesome_nested_set", :source=>"http://gems.github.com", :lib=>"awesome_nested_set"
+  # config.gem "collectiveidea-awesome_nested_set", :source=>"http://gems.github.com", :lib=>"awesome_nested_set"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -67,4 +67,5 @@ Rails::Initializer.run do |config|
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
 end
+load "lib/irb.rb"
 # ENV["EDITOR"] = "vim -c 'setf vo_base'"

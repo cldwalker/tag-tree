@@ -1,33 +1,15 @@
 verbose: true
 constant:
   Url: U
-  Tag: T
-  Node: N
   ActiveRecord::Base: AB
 
 instance_method:
   Url:
-    facet_type_list: fl
-    facet_type_and_save: f
     tag_add_and_remove: tar
     tag_remove_and_save: tr
     tag_add_and_save: ta
     tag_and_save: t
     tag_list: tl
-  Node:
-    view_otl: vo
-    tag_names: tn
-    tagged_by_names: tbn
-    tag_trees: tt
-    tagged_by_trees: tbt
-    descendants: d
-    descendant_names: dn
-    find_descendants: fds
-    find_descendant: fd
-    descendants_by_level: dl
-    parent_names: pn
-    create_child_node: cc
-    leaf_names: ln
   ActiveRecord::Base:
     update_attribute: ua
   HasMachineTags::NamespaceGroup:
@@ -41,22 +23,9 @@ class_method:
     values: vs
     
   Url:
-    used_tags: t
-    tag_stats: ts
-    used_but_not_semantic: us
-    used_to_tag: ut
-    tags_related: tr
     tagged_with: tw
     tagged_with_count: twc
     find_and_change_machine_tags: fcmt
-    semantic_tagged_with: stw
   ActiveRecord::Base:
     find: '[]'
     destroy: d
-  Node:
-    semantic_names: s
-    tag_names: t
-    create_nonsemantic_node: cn
-    create_semantic_node_under: cs
-    create_tag_node_and_parent_node: ct
-    rebuild!: r
