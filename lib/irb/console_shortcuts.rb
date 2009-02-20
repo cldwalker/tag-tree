@@ -43,7 +43,7 @@ end
 #urls-tagged, already formatted
 def ut(*args)
   tag = args.shift
-  args = [:id, :name, :tag_names] if args.empty?
+  args = [:id, :name, :tag_list] if args.empty?
   pp Url.find_tagged_with(tag).amap(*args)
 end
 

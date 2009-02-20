@@ -1,6 +1,5 @@
 class Url < ActiveRecord::Base
   has_machine_tags :quick_mode=>true, :reverse_has_many=>true, :console=>true
-  semantic_tags
   validates_presence_of :name
   validates_uniqueness_of :name
   

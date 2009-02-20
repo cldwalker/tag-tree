@@ -1,0 +1,13 @@
+== Introduction
+
+  Explores the wicked combo of machine tag queries + their results as trees.
+
+== Todo
+
+Update install and migrations.
+
+== Install
+  
+  1. Install necessary gems: `rake gems:install`
+  2. Copy config/database.yml.example to config/database.yml and setup your db.
+  3. Run migrations: `rake db:migrate`
