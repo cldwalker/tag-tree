@@ -30,12 +30,16 @@ instance_method:
     leaf_names: ln
   ActiveRecord::Base:
     update_attribute: ua
+  HasMachineTags::NamespaceGroup:
+    outline_view: ov
 
 class_method:
   Tag:
     machine_tags: mt
-    namespace: nsp
-    tag_group: tg
+    namespaces: nsps
+    predicates: ps
+    values: vs
+    
   Url:
     used_tags: t
     tag_stats: ts
@@ -44,6 +48,7 @@ class_method:
     tags_related: tr
     tagged_with: tw
     tagged_with_count: twc
+    find_and_change_machine_tags: fcmt
     semantic_tagged_with: stw
   ActiveRecord::Base:
     find: '[]'

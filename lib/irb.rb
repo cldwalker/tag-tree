@@ -1,5 +1,6 @@
 #this file contains handy methods and aliases to be used from the console
 require 'pp'
+require 'has_machine_tags/namespace_group'
 
 module ConsoleExtensions
   def self.included(base)
@@ -121,6 +122,18 @@ end
 
 def urn(string)
   Url.find_name_by_regexp(string)
+end
+
+def qg(*args)
+  HasMachineTags::QueryGroup.new(*args)
+end
+
+def tg(*args)
+  HasMachineTags::TagGroup.new(*args)
+end
+
+def ng(*args)
+  HasMachineTags::NamespaceGroup.new(*args)
 end
 
 class Array

@@ -1,5 +1,5 @@
 class Url < ActiveRecord::Base
-  has_machine_tags
+  has_machine_tags :quick_mode=>true, :reverse_has_many=>true
   # acts_as_taggable_on :tags, :facet_types
   validates_presence_of :name
   validates_uniqueness_of :name
