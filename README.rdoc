@@ -1,13 +1,36 @@
-== Introduction
+== Description
 
-  Explores the wicked combo of machine tag queries + their results as trees.
-
-== Todo
-
-Update install and migrations.
+  This projects is both my current personal bookmark manager and a demo for machine tags.
+Being a bookmark manager, it's two main models are urls and tags. Tags are really machine tags using my {has_machine_tags plugin}[http://github.com/cldwalker/has_machine_tags].
+If you don't know what machine tags are read {this}[http://www.flickr.com/groups/api/discuss/72157594497877875].
+Machine tags are used to retrieve and display the urls in efficient and novel ways.
+Currently this project uses irb as its main interface.
 
 == Install
   
   1. Install necessary gems: `rake gems:install`
-  2. Copy config/database.yml.example to config/database.yml and setup your db.
+  2. Copy config/database.yml.example to config/database.yml and setup your db as needed.
   3. Run migrations: `rake db:migrate`
+
+== Usage
+
+  bash> script/console
+  Loading development environment (Rails 2.2.2)
+
+  # Let's machine-tag some urls using Url.quick_create() which is aliased to uc()
+  # Url.quick_create() delimits its arguments with ',,'
+  irb>> uc "http://guides.rubyonrails.org/creating_plugins.html,,article:rails"
+  => #<Url id: 1, name: "http://guides.rubyonrails.org/creating_plugins.html", description: nil, created_at: "2009-02-21 15:48:43", updated_at: "2009-02-21 15:48:43">
+
+  # Article is tagged with rails
+  irb>>Url[1].tag_list
+  => ["article:tags=rails"]
+
+  TODO
+
+== Todo
+
+* Docs!
+* Explore more outline views of machine tag queries.
+* Sync with delicious.com.
+* Web interface as needed.
