@@ -22,9 +22,6 @@ Rails::Initializer.run do |config|
 
   # Specify gems that this application depends on. 
   # They can then be installed with "rake gems:install" on new installations.
-  # config.gem "bj"
-  # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  # config.gem "aws-s3", :lib => "aws/s3"
   # config.gem "mbleigh-acts-as-taggable-on", :source => "http://gems.github.com", :lib => "acts-as-taggable-on"
   # config.gem "collectiveidea-awesome_nested_set", :source=>"http://gems.github.com", :lib=>"awesome_nested_set"
   # config.gem "cldwalker-has_machine_tags", :source=>"http://gems.github.com", :lib=>"has_machine_tags"
@@ -33,7 +30,7 @@ Rails::Initializer.run do |config|
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
   # :all can be used as a placeholder for all plugins not explicitly named
-  config.plugins = [ :all, :has_machine_tags]
+  #config.plugins = [ :all, :has_machine_tags]
 
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
@@ -69,5 +66,4 @@ Rails::Initializer.run do |config|
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
 end
-load "lib/irb.rb"
-# ENV["EDITOR"] = "vim -c 'setf vo_base'"
+load "lib/irb.rb" if $0 == 'irb'
