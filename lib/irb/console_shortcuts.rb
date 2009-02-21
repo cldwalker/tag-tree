@@ -1,11 +1,11 @@
 begin
-  require 'alias' # gem install cldwalker-alias
-rescue LoadError
-  # defaults to a local alias gem
+  # attempt to load a local alias gem
   require 'local_gem' # gem install cldwalker-local_gem
   LocalGem.local_require 'alias' # gem install cldwalker-alias
-  Alias.init
+rescue LoadError
+  require 'alias' # gem install cldwalker-alias
 end
+Alias.init
 
 def trn(name)
   Tag.find_name_by_regexp(name.to_s)
