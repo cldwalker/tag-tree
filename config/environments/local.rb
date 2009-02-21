@@ -1,3 +1,11 @@
+# Note: This is a local development environment I use.
+
+# Local gem configuration
+# config.gem "mbleigh-acts-as-taggable-on", :source => "http://gems.github.com", :lib => "acts-as-taggable-on"
+# config.gem "collectiveidea-awesome_nested_set", :source=>"http://gems.github.com", :lib=>"awesome_nested_set"
+config.gems = []
+
+
 # Settings specified here will take precedence over those in config/environment.rb
 
 # In the development environment your application's code is reloaded on
