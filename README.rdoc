@@ -1,6 +1,6 @@
 == Description
 
-  This projects is both my current personal bookmark manager and a demo for machine tags.
+This project is both my current personal bookmark manager and a demo for machine tags.
 Being a bookmark manager, it's two main models are urls and tags. Tags are really machine tags using my {has_machine_tags plugin}[http://github.com/cldwalker/has_machine_tags].
 If you don't know what machine tags are read {this}[http://www.flickr.com/groups/api/discuss/72157594497877875].
 Machine tags are used to retrieve and display the urls in efficient and novel ways.

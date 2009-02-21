@@ -56,13 +56,13 @@ def urn(string)
 end
 
 def qg(*args)
-  HasMachineTags::QueryGroup.new(*args)
+  QueryGroup.new(*args)
 end
 
 def tg(*args)
-  HasMachineTags::TagGroup.new(*args)
+  TagGroup.new(*args)
 end
 
 def ng(*args)
-  HasMachineTags::NamespaceGroup.new(*args)
+  NamespaceGroup.new(*args)
 end

@@ -1,5 +1,5 @@
 require 'pp'
-require 'has_machine_tags/namespace_group'
+require 'namespace_group'
 require 'irb/active_record_extensions'
 require 'irb/core_extensions'
 require 'irb/console_shortcuts'
