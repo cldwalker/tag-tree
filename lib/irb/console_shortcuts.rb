@@ -20,9 +20,14 @@ def change_tag(old_name, new_name)
 end
 
 #open url object id
-def o(*url_ids)
-  urls = url_ids.map {|e| Url.find_by_id(e)}.compact.map {|e| "'#{e.name}'"}
-  system("open " + urls.join(" "))
+def o(*args)
+  if args[0].is_a?(Integer)
+    results = args.map {|e| Url.find_by_id(e)}
+  else
+    results = Url.tagged_with(*args)
+  end
+  urls = results.compact.map(&:name)
+  system(*(['open'] + urls))
 end
 
 #url-paged
@@ -55,14 +60,29 @@ def urn(string)
   Url.find_name_by_regexp(string)
 end
 
+def parse_method_options(args, options)
+  MethodOptionParser.parse(args, options)
+end
+
+def parse_query_options(args)
+  if args.size == 1
+    args, options = parse_method_options(args[0], :view=>[:result, :group, :count, :description_result])
+    args << options
+  end
+  args
+end
+
 def qg(*args)
+  args = parse_query_options(args)
   QueryGroup.new(*args)
 end
 
 def tg(*args)
+  args = parse_query_options(args)
   TagGroup.new(*args)
 end
 
 def ng(*args)
+  args = parse_query_options(args)
   NamespaceGroup.new(*args)
 end

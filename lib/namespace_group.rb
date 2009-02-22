@@ -70,10 +70,12 @@ class NamespaceGroup #:nodoc:
       values = predicate_view(pred, type) || vals
       values.each {|e|
           body << level_delim * 2 + e
-          if type == :result
+          if type == :result || type == :description_result
             urls = Url.tagged_with(Tag.build_machine_tag(@name, pred, e))
             urls.each {|u|
-              body << level_delim * 3 + format_result(u)
+              string = level_delim * 3 + format_result(u)
+              string += " : #{u.description}" if type == :description_result
+              body << string
             }
           end
       }

@@ -2,7 +2,7 @@ verbose: true
 constant:
   Url: U
   ActiveRecord::Base: AB
-
+  Tag: T
 instance_method:
   Url:
     tag_add_and_remove: tar
@@ -14,14 +14,12 @@ instance_method:
     update_attribute: ua
   HasMachineTags::NamespaceGroup:
     outline_view: ov
-
 class_method:
   Tag:
     machine_tags: mt
     namespaces: nsps
     predicates: ps
     values: vs
-    
   Url:
     tagged_with: tw
     tagged_with_count: twc
