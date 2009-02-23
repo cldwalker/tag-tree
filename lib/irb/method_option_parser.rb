@@ -5,8 +5,18 @@ rescue LoadError
 end
 require 'shellwords'
 
+# This class extends functionality from Thor's {Thor::Options class}[http://github.com/wycats/thor/blob/master/lib/thor/options.rb].
+# This class provides one main method, MethodOptionParser.parse(). This class adds an enumerated option type which auto aliases known values
+# and a symbol option type which allows option values to return as a symbol.
 class MethodOptionParser
-  class <<self    
+  class <<self
+    # Takes a string or array of arguments and a hash of options expected in those arguments and returns the arguments without the options
+    # and the parsed out options.
+    # Examples:
+    #   MethodOptionParser.parse("some args -v -t a", :verbose=>:boolean, :type=>[:gem, :application, :other] )
+    #   => {:verbose=>true, :type=>:application}
+    #   MethodOptionParser.parse("some args -t other", :type=>:symbol)
+    #   => {:type=>:other}
     def parse(args, options)
       pre_convert_thor_options(options)
       op = Thor::Options.new(options)
