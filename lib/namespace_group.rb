@@ -70,11 +70,13 @@ class NamespaceGroup #:nodoc:
       values = predicate_view(pred, type) || vals
       values.each {|e|
           body << level_delim * 2 + e
-          if type == :result || type == :description_result
-            urls = Url.tagged_with(Tag.build_machine_tag(@name, pred, e))
+          if [:description_result, :result, :tag_result].include?(type)
+            tagged_with_options = type == :tag_result ? {:include=>:tags} : {}
+            urls = Url.tagged_with(Tag.build_machine_tag(@name, pred, e), tagged_with_options)
             urls.each {|u|
               string = level_delim * 3 + format_result(u)
               string += " : #{u.description}" if type == :description_result
+              string += " : #{u.tag_list}" if type == :tag_result
               body << string
             }
           end

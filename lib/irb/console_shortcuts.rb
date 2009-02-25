@@ -11,6 +11,10 @@ def trn(name)
   Tag.find_name_by_regexp(name.to_s)
 end
 
+def mtrn(name)
+  Tag.search_machine_tag_names(name)
+end
+
 def tn(name)
   Tag.find_by_name(name.to_s)
 end
@@ -28,6 +32,10 @@ def o(*args)
   end
   urls = results.compact.map(&:name)
   system(*(['open'] + urls))
+end
+
+def tl(*ids)
+  ids.map {|e| [e, Url.find(e).tag_list ] }
 end
 
 #url-paged
@@ -49,7 +57,9 @@ end
 def ut(*args)
   tag = args.shift
   args = [:id, :name, :tag_list] if args.empty?
-  pp Url.find_tagged_with(tag).amap(*args)
+  results = tag.split(/\s*\+\s*/).map {|e| Url.tagged_with(e) }
+  results = results.size > 1 ? results.inject {|t,v| t & v } : results.flatten
+  pp results.amap(*args)
 end
 
 def uc(string)
@@ -60,13 +70,17 @@ def urn(string)
   Url.find_name_by_regexp(string)
 end
 
+def convert(*args)
+  Url.find_and_change_machine_tags(args.map {|e| Url.find(e)}, :save=>true)
+end
+
 def parse_method_options(args, options)
   MethodOptionParser.parse(args, options)
 end
 
 def parse_query_options(args)
   if args.size == 1
-    args, options = parse_method_options(args[0], :view=>[:result, :group, :count, :description_result])
+    args, options = parse_method_options(args[0], :view=>[:result, :group, :count, :description_result, :tag_result])
     args << options
   end
   args
