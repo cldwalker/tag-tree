@@ -25,17 +25,18 @@ end
 
 #open url object id
 def o(*args)
-  if args[0].is_a?(Integer)
-    results = args.map {|e| Url.find_by_id(e)}
-  else
-    results = Url.tagged_with(*args)
-  end
-  urls = results.compact.map(&:name)
+  urls = Url.console_find(args).map(&:name)
   system(*(['open'] + urls))
 end
 
-def tl(*ids)
-  ids.map {|e| [e, Url.find(e).tag_list ] }
+def ucp(*args)
+  to_copy = Url.console_find(args).map(&:name).join(" ")
+  IO.popen('pbcopy', 'w+') {|e| e.write(to_copy) }
+end
+
+def tl(*args)
+  results = Url.console_find(args)
+  results.map {|e| [e, e.tag_list ] }
 end
 
 #url-paged

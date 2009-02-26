@@ -4,6 +4,17 @@ class Url < ActiveRecord::Base
   validates_uniqueness_of :name
   
   class<<self
+    def console_find(args)
+      if args[0].is_a?(Integer)
+        results = args.map {|e| find(e)}
+      elsif args[0].is_a?(ActiveRecord::Base)
+        results = args
+      else
+        results = tagged_with(*args)
+      end
+      results
+    end
+      
     def quick_create(string)
       name, description, tags = string.split(",,")
       create_hash = {:name=>name}
@@ -20,8 +31,9 @@ class Url < ActiveRecord::Base
       tagged_with(*args).count
     end
 
-    def find_and_change_machine_tags(find_tags, options={})
-      results = find_tags.is_a?(Array) ? find_tags : tagged_with(find_tags)
+    def find_and_change_machine_tags(*args)
+      options = args[-1].is_a?(Hash) ? args[-1].pop : {}
+      results = console_find(args)
       namespace = results.select {|e| 
         nsp = e.tag_list.select {|f| break $1 if f =~ /^(\S+):/}
          break nsp if !nsp.empty?
@@ -43,8 +55,8 @@ class Url < ActiveRecord::Base
       nil
     end
 
-    def find_and_regex_change_tags(find_tags, regex, substitution, options={})
-      results = find_tags.is_a?(Array) ? find_tags : tagged_with(find_tags)
+    def find_and_regex_change_tags(find_args, regex, substitution, options={})
+      results = Url.console_find(find_args)
       results.each do |e|
         new_tag_list = e.tag_list.map {|f| f.gsub(regex, substitution)}
         p [e.id, e.tag_list, new_tag_list]
