@@ -6,11 +6,11 @@ class NamespaceGroup #:nodoc:
     @options = options
     @tags = options[:tags] if options[:tags]
   end
-  
+
   def tags
     @tags ||= Tag.find_all_by_namespace(@name)
   end
-  
+
   def predicates
     tags.map(&:predicate)
   end
@@ -25,15 +25,15 @@ class NamespaceGroup #:nodoc:
     }
   end
   alias :pm :predicate_map
-  
+
   def value_count(pred,value)
     Url.tagged_with(Tag.build_machine_tag(@name, pred, value)).count
   end
-  
+
   def pred_count(pred)
     (predicate_map[pred] ||[]).map {|e| [e, value_count(pred, e)]}
   end
-  
+
   def group_pred_count(pred)
     pred_count(pred).inject({}) {|hash,(k,v)|
       (hash[v] ||= []) << k
@@ -62,6 +62,36 @@ class NamespaceGroup #:nodoc:
     end
   end
   
+  def tagged_items_per_node(tagged_items, pred, value, view_type)
+    current_machine_tag = Tag.build_machine_tag(@name, pred,value)
+    tagged_items.select {|e| 
+      e.tag_list.include?(current_machine_tag)
+    }
+  end
+  
+  def results_per_node(pred, value, view_type)
+    if @options[:tagged_items]
+      tagged_items_per_node(@options[:tagged_items], pred, value, view_type)
+    else
+      tagged_with_options = view_type == :tag_result ? {:include=>:tags} : {}
+      Url.tagged_with(Tag.build_machine_tag(@name, pred, value), tagged_with_options)
+    end
+  end
+  
+  def result_view(pred, value, view_type)
+    if [:description_result, :result, :tag_result].include?(view_type)
+      urls = self.results_per_node(pred, value, view_type)
+      urls.map {|u|
+        string = format_result(u)
+        string += " : #{u.description}" if view_type == :description_result
+        string += " : #{u.tag_list}" if view_type == :tag_result
+        string
+      }
+    else
+      []
+    end
+  end
+  
   def outline_view(type=nil)
     body = [@name]
     level_delim = "\t"
@@ -69,17 +99,10 @@ class NamespaceGroup #:nodoc:
       body << [level_delim + pred]
       values = predicate_view(pred, type) || vals
       values.each {|e|
-          body << level_delim * 2 + e
-          if [:description_result, :result, :tag_result].include?(type)
-            tagged_with_options = type == :tag_result ? {:include=>:tags} : {}
-            urls = Url.tagged_with(Tag.build_machine_tag(@name, pred, e), tagged_with_options)
-            urls.each {|u|
-              string = level_delim * 3 + format_result(u)
-              string += " : #{u.description}" if type == :description_result
-              string += " : #{u.tag_list}" if type == :tag_result
-              body << string
-            }
-          end
+          value_string = level_delim * 2 + e
+          value_string += ": #{Tag.machine_tag(@name, pred, e).description}" if type == :value_description
+          body << value_string
+          body += result_view(pred, e, type).map {|e| level_delim * 3 + e}
       }
     end
     body.join("\n")
@@ -142,7 +165,21 @@ class TagGroup < NamespaceGroup #:nodoc:
 end
 
 class QueryGroup < TagGroup #:nodoc:
+  def namespace_groups
+    unless @namespace_groups
+      @namespace_groups = namespace_tags.map {|name, tags|
+        NamespaceGroup.new(name, :tags=>tags, :tagged_items=>tagged_items)
+      }
+    end
+    @namespace_groups
+  end
+  
+  #same as taggables
+  def tagged_items
+    @tagged_items ||= Url.tagged_with(@name, :include=>:tags)
+  end
+  
   def tags
-    @tags ||= Url.tagged_with(@name).map(&:tags).flatten.uniq
+    @tags ||= tagged_items.map(&:tags).flatten.uniq
   end
 end

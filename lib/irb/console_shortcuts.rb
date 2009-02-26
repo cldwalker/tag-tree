@@ -80,7 +80,7 @@ end
 
 def parse_query_options(args)
   if args.size == 1
-    args, options = parse_method_options(args[0], :view=>[:result, :group, :count, :description_result, :tag_result])
+    args, options = parse_method_options(args[0], :view=>[:result, :group, :count, :description_result, :tag_result, :value_description])
     args << options
   end
   args
