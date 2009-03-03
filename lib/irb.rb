@@ -1,7 +1,4 @@
-require 'pp'
 require 'namespace_group'
 require 'irb/active_record_extensions'
 require 'irb/core_extensions'
-require 'irb/method_option_parser'
 require 'irb/console_shortcuts'
-require 'irb/table'

@@ -1,3 +1,7 @@
+require 'pp'
+require 'irb/table'
+require 'irb/method_option_parser'
+
 begin
   # attempt to load a local alias gem
   require 'local_gem' # gem install cldwalker-local_gem
@@ -46,9 +50,9 @@ def up(offset=nil, limit=20)
   columns = [:id, :name, :tag_list]
   #only set if an offset is given
   if offset
-    @url_results = uf(offset, limit).amap(*columns)
+    @results = uf(offset,limit)
   end
-  pp @url_results
+  object_table(@results, columns)
 end
 
 #url-find
@@ -62,7 +66,7 @@ def ut(*args)
   args = [:id, :name, :tag_list] if args.empty?
   results = tag.split(/\s*\+\s*/).map {|e| Url.tagged_with(e) }
   results = results.size > 1 ? results.inject {|t,v| t & v } : results.flatten
-  pp results.amap(*args)
+  object_table(results, args)
 end
 
 def uc(string)
