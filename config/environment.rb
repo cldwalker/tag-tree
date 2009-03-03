@@ -24,6 +24,7 @@ Rails::Initializer.run do |config|
   # They can then be installed with "rake gems:install" on new installations.
    config.gem "cldwalker-has_machine_tags", :source=>"http://gems.github.com", :lib=>"has_machine_tags"
    config.gem "cldwalker-alias", :source=>"http://gems.github.com", :lib=>"alias"
+   config.gem "cldwalker-console_update", :source=>"http://gems.github.com", :lib=>"console_update"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

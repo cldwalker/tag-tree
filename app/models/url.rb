@@ -2,6 +2,7 @@ class Url < ActiveRecord::Base
   has_machine_tags :quick_mode=>true, :reverse_has_many=>true, :console=>true
   validates_presence_of :name
   validates_uniqueness_of :name
+  can_console_update :only=>['name', 'description', 'tag_list']
   
   class<<self
     def console_find(args)

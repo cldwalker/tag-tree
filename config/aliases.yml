@@ -14,6 +14,10 @@ instance_method:
     update_attribute: ua
   HasMachineTags::NamespaceGroup:
     outline_view: ov
+  ConsoleUpdate::SingletonMethods:
+    console_update: cu
+  ConsoleUpdate::NamedScope:
+    console_update: cu
 class_method:
   Tag:
     machine_tags: mt

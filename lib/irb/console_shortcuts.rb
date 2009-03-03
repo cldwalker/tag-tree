@@ -7,6 +7,8 @@ rescue LoadError
 end
 Alias.init
 
+ConsoleUpdate.enable_named_scope
+
 def trn(name)
   Tag.find_name_by_regexp(name.to_s)
 end
@@ -36,7 +38,7 @@ end
 
 def tl(*args)
   results = Url.console_find(args)
-  results.map {|e| [e, e.tag_list ] }
+  results.map {|e| [e.id, e.tag_list ] }
 end
 
 #url-paged
