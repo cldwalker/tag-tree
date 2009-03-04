@@ -31,3 +31,20 @@ class_method:
   ActiveRecord::Base:
     find: '[]'
     destroy: d
+delegate_to_class_method:
+  ConsoleMethods:
+    - - trn
+      - Tag
+      - find_name_by_regexp
+    - - tn
+      - Tag
+      - find_by_name
+    - - mtrn
+      - Tag
+      - search_machine_tag_names
+    - - uc
+      - Url
+      - quick_create
+    - - urn
+      - Url
+      - find_name_by_regexp

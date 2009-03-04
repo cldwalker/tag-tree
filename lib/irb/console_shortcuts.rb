@@ -1,6 +1,8 @@
 require 'pp'
 require 'irb/table'
 require 'irb/method_option_parser'
+# used for extending the main irb object
+module ConsoleMethods; end
 
 begin
   # attempt to load a local alias gem
@@ -10,20 +12,10 @@ rescue LoadError
   require 'alias' # gem install cldwalker-alias
 end
 Alias.init
+#extend delegated methods
+self.extend ConsoleMethods
 
 ConsoleUpdate.enable_named_scope
-
-def trn(name)
-  Tag.find_name_by_regexp(name.to_s)
-end
-
-def mtrn(name)
-  Tag.search_machine_tag_names(name)
-end
-
-def tn(name)
-  Tag.find_by_name(name.to_s)
-end
 
 def change_tag(old_name, new_name)
   Tag.find_by_name(old_name).update_attribute :name, new_name
@@ -47,7 +39,7 @@ end
 
 #url-paged
 def up(offset=nil, limit=20)
-  columns = [:id, :name, :tag_list]
+  columns = [:id, :name, :quick_mode_tag_list]
   #only set if an offset is given
   if offset
     @results = uf(offset,limit)
@@ -63,18 +55,10 @@ end
 #urls-tagged, already formatted
 def ut(*args)
   tag = args.shift
-  args = [:id, :name, :tag_list] if args.empty?
+  args = [:id, :name, :quick_mode_tag_list] if args.empty?
   results = tag.split(/\s*\+\s*/).map {|e| Url.tagged_with(e) }
   results = results.size > 1 ? results.inject {|t,v| t & v } : results.flatten
   object_table(results, args)
-end
-
-def uc(string)
-  Url.quick_create(string)
-end
-
-def urn(string)
-  Url.find_name_by_regexp(string)
 end
 
 def convert(*args)
