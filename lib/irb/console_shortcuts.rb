@@ -1,5 +1,5 @@
 require 'pp'
-require 'irb/table'
+# require 'irb/table'
 require 'irb/method_option_parser'
 # used for extending the main irb object
 module ConsoleMethods; end
@@ -32,37 +32,18 @@ def ucp(*args)
   IO.popen('pbcopy', 'w+') {|e| e.write(to_copy) }
 end
 
-def tl(*args)
-  results = Url.console_find(args)
-  results.map {|e| [e.id, e.tag_list ] }
-end
-
 #url-paged
 def up(offset=nil, limit=20)
   columns = [:id, :name, :quick_mode_tag_list]
   #only set if an offset is given
   if offset
-    @results = uf(offset,limit)
+    @results = Url.find(:all, :offset=>offset, :limit=>limit)
   end
-  object_table(@results, columns)
-end
-
-#url-find
-def uf(offset=0, limit=20)
-  Url.find(:all, :offset=>offset, :limit=>limit)
-end
-
-#urls-tagged, already formatted
-def ut(*args)
-  tag = args.shift
-  args = [:id, :name, :quick_mode_tag_list] if args.empty?
-  results = tag.split(/\s*\+\s*/).map {|e| Url.tagged_with(e) }
-  results = results.size > 1 ? results.inject {|t,v| t & v } : results.flatten
-  object_table(results, args)
+  @results
 end
 
 def convert(*args)
-  Url.find_and_change_machine_tags(args.map {|e| Url.find(e)}, :save=>true)
+  Url.find_and_change_machine_tags(*(args << {:save=>true}))
 end
 
 def parse_method_options(args, options)

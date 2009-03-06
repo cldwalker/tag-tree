@@ -31,9 +31,15 @@ class Url < ActiveRecord::Base
     def tagged_with_count(*args)
       tagged_with(*args).count
     end
+    
+    def super_tagged_with(*args)
+      query = args.shift
+      results = query.split(/\s*\+\s*/).map {|e| Url.tagged_with(e, *args) }
+      results.size > 1 ? results.inject {|t,v| t & v } : results.flatten
+    end
 
     def find_and_change_machine_tags(*args)
-      options = args[-1].is_a?(Hash) ? args[-1].pop : {}
+      options = args[-1].is_a?(Hash) ? args.pop : {}
       results = console_find(args)
       namespace = results.select {|e| 
         nsp = e.tag_list.select {|f| break $1 if f =~ /^(\S+):/}

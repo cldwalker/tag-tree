@@ -48,3 +48,9 @@ delegate_to_class_method:
     - - urn
       - Url
       - find_name_by_regexp
+    - - ut
+      - Url
+      - super_tagged_with
+    - - uf
+      - Url
+      - console_find
