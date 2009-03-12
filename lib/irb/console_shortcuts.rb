@@ -17,6 +17,13 @@ self.extend ConsoleMethods
 
 ConsoleUpdate.enable_named_scope
 
+begin
+  LocalGem.local_require 'hirb'
+rescue
+  require 'hirb'
+end
+Hirb::View.enable
+
 def change_tag(old_name, new_name)
   Tag.find_by_name(old_name).update_attribute :name, new_name
 end
