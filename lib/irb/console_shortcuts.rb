@@ -23,6 +23,7 @@ rescue
   require 'hirb'
 end
 Hirb::View.enable
+self.extend Hirb::Console
 
 def change_tag(old_name, new_name)
   Tag.find_by_name(old_name).update_attribute :name, new_name

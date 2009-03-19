@@ -92,28 +92,24 @@ class NamespaceGroup #:nodoc:
     end
   end
   
-  def outline_view(type=nil)
-    body = [@name]
-    level_delim = "\t"
+  def to_tree(type=nil)
+    type ||= @options[:view]
+    tree = [[0, @name]]
     predicate_map.each do |pred, vals|
-      body << [level_delim + pred]
+      tree << [1, pred]
       values = predicate_view(pred, type) || vals
       values.each {|e|
-          value_string = level_delim * 2 + e
+          value_string = e
           value_string += ": #{Tag.machine_tag(@name, pred, e).description}" if type == :value_description
-          body << value_string
-          body += result_view(pred, e, type).map {|e| level_delim * 3 + e}
+          tree << [2, value_string]
+          tree += result_view(pred, e, type).map {|f| [3, f]}
       }
     end
-    body.join("\n")
+    tree
   end
   
   def format_result(result)
     "#{result.id}: #{result.name}"
-  end
-
-  def inspect
-    outline_view(@options[:view])
   end
   
   def duplicate_values
@@ -137,12 +133,10 @@ class TagGroup < NamespaceGroup #:nodoc:
     tags.map(&:namespace).uniq
   end
   
-  def outline_view(type=nil)
-    "\n" + namespace_groups.map {|e| e.outline_view(type) }.join("\n")
+  def to_tree
+    namespace_groups.inject([]) {|t,e| t + e.to_tree(@options[:view]) }
   end
-  
-  def inspect; super; end
-  
+
   def namespace_tags
     tags.inject({}) {|h,t|
       (h[t.namespace] ||= []) << t

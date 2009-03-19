@@ -5,7 +5,8 @@ class Url < ActiveRecord::Base
   can_console_update :only=>['name', 'description', 'tag_list']
   
   class<<self
-    def console_find(args)
+    def console_find(*args)
+      args.flatten!
       if args[0].is_a?(Integer)
         results = args.map {|e| find(e)}
       elsif args[0].is_a?(ActiveRecord::Base)

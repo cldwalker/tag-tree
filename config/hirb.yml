@@ -7,3 +7,7 @@
           - name
           - description
           - quick_mode_tag_list
+    NamespaceGroup:
+      :class: Hirb::Helpers::Tree
+      :output_method: to_tree
+      :ancestor: true

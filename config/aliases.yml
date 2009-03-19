@@ -12,8 +12,6 @@ instance_method:
     tag_list: tl
   ActiveRecord::Base:
     update_attribute: ua
-  HasMachineTags::NamespaceGroup:
-    outline_view: ov
   ConsoleUpdate::SingletonMethods:
     console_update: cu
   ConsoleUpdate::NamedScope:
