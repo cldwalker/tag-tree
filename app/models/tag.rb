@@ -16,5 +16,9 @@ class Tag < ActiveRecord::Base
     def machine_tag(namespace, predicate, value)
       find(:first, :conditions=>{:namespace=>namespace, :predicate=>predicate, :value=>value})
     end
+
+    def machine_tag_config(reload=false)
+      @config = reload || @config.nil? ? YAML::load_file(RAILS_ROOT + '/config/machine_tags.yml') : @config
+    end
   end
 end
