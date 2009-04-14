@@ -10,18 +10,9 @@ class Url < ActiveRecord::Base
 
   def default_predicate(value, namespace)
     mtag_to_match = Tag.build_machine_tag(namespace, '*', value)
-    (match = default_predicates.find {|e| mtag_to_match[/#{e[0].gsub('*', '.*')}/]}) ? match[1] : 'tags'
-    # (mtag_value = Tag.machine_tag_config[value]) && mtag_value[:default] ? mtag_value[:default] : 'tags' 
-    # (mtags = Tag.machine_tags(Tag.build_machine_tag(namespace, '*', value)) && mtags.size == 1) ? mtags[0].predicate : 'tags'
+    (match = Tag.default_predicates.find {|e| mtag_to_match[/#{e[0].gsub('*', '.*')}/]}) ? match[1] : 'tags'
   end
-  
-  def default_predicates
-    [
-      ["*:*=(ruby|perl|sh|python|js|flash|cpp|bash)", 'plang'], ["*:*=(fl|sfl|gville|brasil)", 'location'],
-      ["*:*=(ghub|del|flickr|twitter|gg)", 'site'], ['*:*=(linux|unix|osx)', 'os'],
-    ]
-  end
-  
+
   class<<self
     def console_find(*args)
       args.flatten!

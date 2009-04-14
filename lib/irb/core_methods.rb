@@ -41,6 +41,11 @@ module CoreMethods
   end
 
   def convert(*args)
+    options = args[1] || {}
+    Url.find_and_regex_change_tags(args[0], /^/, options[:n] || 'site:', options)
+  end
+
+  def pconvert(*args)
     Url.find_and_change_machine_tags(*(args << {:save=>true}))
   end
 

@@ -17,8 +17,33 @@ class Tag < ActiveRecord::Base
       find(:first, :conditions=>{:namespace=>namespace, :predicate=>predicate, :value=>value})
     end
 
+    # default predicate methods
     def machine_tag_config(reload=false)
       @config = reload || @config.nil? ? YAML::load_file(RAILS_ROOT + '/config/machine_tags.yml') : @config
+    end
+
+    def global_predicates(reload=false)
+      if reload || @global_predicates.nil?
+        @global_predicates = machine_tag_config[:global_predicates].map {|e| 
+          mtags = machine_tags(Tag.build_machine_tag('*', e, '*')); ["*:*=(#{mtags.map(&:value).uniq.join('|')})", e]}
+      end
+      @global_predicates
+    end
+
+    def wildcard_predicates(reload=false)
+      if reload || @wildcard_predicates.nil?
+        @wildcard_predicates = machine_tag_config[:dynamic_predicates].map {|e| 
+          mtags = machine_tags(e); ["#{mtags[0].namespace}:*=(#{mtags.map(&:value).uniq.join('|')})", mtags[0].predicate]}
+      end
+      @wildcard_predicates
+    end
+
+    def generated_predicates(reload=false)
+      global_predicates(reload) + wildcard_predicates(reload)
+    end
+
+    def default_predicates
+      (machine_tag_config[:static_predicates] || [] + generated_predicates).map {|e| ["^"+e[0]+"$", e[1]]}
     end
   end
 end
