@@ -48,8 +48,7 @@ class Delicious < Thor
   desc "diff", "Shows difference between local + remote urls"
   def diff
     remote = @client.posts_all.map {|e| {:url=>e.url.to_s, :tags=>e.tags.sort} }
-    local = Url.all.map {|e| {:url=>to_full_delicious_url(e.name), :tags=>e.tag_list.sort} }
-    only_local = local.reject {|e| remote.include? e }
+    only_local = Url.all.reject {|e| h = {:url=>to_full_delicious_url(e.name), :tags=>e.tag_list.sort}; remote.include?(h) }
     print_table only_local
     puts "Found #{only_local.size} urls"
   end
@@ -69,6 +68,11 @@ class Delicious < Thor
     Tag.namespaces.each {|e| @client.bundles_set e, Tag.find_name_by_regexp("#{e}:").map(&:name) }
     normal_tags = @client.tags_get.select {|e| e.name !~ /:.*=/ }.map(&:name)
     @client.bundles_set 'normal_tags', normal_tags
+  end
+  
+  desc "touch", "Touches config's updated_at with current time"
+  def touch
+    write_config(config.merge(:updated_at=>Time.now.utc))
   end
 
   def print_table(urls)
@@ -118,7 +122,7 @@ class Delicious < Thor
         puts("#{e.id}: #{$!}")
       end
     }
-    write_config(config.merge(:updated_at=>Time.now))
+    write_config(config.merge(:updated_at=>Time.now.utc))
     puts "Added #{urls.size} urls"
   end
 

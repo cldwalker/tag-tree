@@ -3,6 +3,7 @@ class Url < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
   can_console_update :only=>['name', 'description', 'tag_list']
+  before_save :update_timestamp
   
   def current_tag_list(list)
     HasMachineTags::TagList.new(list, :quick_mode=>self.quick_mode, :default_predicate=> proc {|*args| default_predicate(*args) })
@@ -11,6 +12,10 @@ class Url < ActiveRecord::Base
   def default_predicate(value, namespace)
     mtag_to_match = Tag.build_machine_tag(namespace, '*', value)
     (match = Tag.default_predicates.find {|e| mtag_to_match[/#{e[0].gsub('*', '.*')}/]}) ? match[1] : 'tags'
+  end
+  
+  def update_timestamp
+    self.updated_at = (self.class.default_timezone == :utc ? Time.now.utc : Time.now)
   end
 
   class<<self
