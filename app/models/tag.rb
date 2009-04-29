@@ -37,6 +37,11 @@ class Tag < ActiveRecord::Base
       end
       @wildcard_predicates
     end
+    
+    def machine_tag_reload
+      machine_tag_config(true)
+      generated_predicates(true)
+    end
 
     def generated_predicates(reload=false)
       global_predicates(reload) + wildcard_predicates(reload)

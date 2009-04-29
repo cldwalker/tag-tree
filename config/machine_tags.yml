@@ -7,9 +7,12 @@
   - site
   - os
   - lang
+  - app
+  - std
 :dynamic_predicates:
   - site:type=*
   - gem:type=*
   - app:type=*
   - plugin:type=*
   - person:name=*
+  - lib:plugin=*

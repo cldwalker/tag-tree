@@ -40,6 +40,9 @@ delegate_to_class_method:
     - - mtrn
       - Tag
       - search_machine_tag_names
+    - - mtr
+      - Tag
+      - machine_tag_reload
     - - uc
       - Url
       - quick_create
