@@ -18,7 +18,7 @@ commands:
   mtrn:
     description: find tags within machine tag fields with regex string
   uc:
-    description: create a url
+    description: quickly create a url
   urn:
     description: search urls with regex string
   ut:

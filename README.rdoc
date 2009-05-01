@@ -1,34 +1,130 @@
 == Description
 
-This is my machine tag based bookmark manager, made mainly for the console. Machine tags are implemented using my {has_machine_tags plugin}[http://github.com/cldwalker/has_machine_tags].
-To use this app you need to know {what machine tags are}[http://tagaholic.me/2009/03/26/what-are-machine-tags.html].
-This app provides machine tag trees created from {wildcard machine
-tags}[http://tagaholic.me/has_machine_tags/doc/classes/HasMachineTags/TagMethods.html].
+This is a machine tag based bookmark manager, primarily for console use. Machine tags are
+implemented using my {has_machine_tags plugin}[http://github.com/cldwalker/has_machine_tags]. To
+use this app you need to know {what machine tags
+are}[http://tagaholic.me/2009/03/26/what-are-machine-tags.html].  This app generates
+machine tag trees from {wildcard machine
+tags}[http://tagaholic.me/has_machine_tags/doc/classes/HasMachineTags/TagMethods.html].  To learn
+more about machine tag trees,
+{read}[http://tagaholic.me/2009/04/14/i-am-machine-tag-and-so-can-you.html] {these
+posts}[http://tagaholic.me/2009/04/26/machine-tagging-with-delicious.html].
 
-== Install
+== Setup
   
   1. Install necessary gems: `rake gems:install`
   2. Copy config/database.yml.example to config/database.yml and setup your db as needed.
   3. Run migrations: `rake db:migrate`
+  4. Optionally setup your own commandline aliases at config/aliases.yml using config/aliases.yml.example as an example.
 
 == Usage
 
+Note: The ascii tables are what you actually see in your console, compliments of
+{the hirb gem}[http://tagaholic.me/hirb/].
+
   bash> script/console
 
-  # Let's machine-tag some urls using Url.quick_create() which is aliased to uc()
-  # Url.quick_create() delimits its arguments with ',,'
-  irb>> uc "http://guides.rubyonrails.org/creating_plugins.html,,article:rails"
-  => #<Url id: 1, name: "http://guides.rubyonrails.org/creating_plugins.html", description: nil, created_at: "2009-02-21 15:48:43", updated_at: "2009-02-21 15:48:43">
+  # list commands that are available in console
+  irb>> list
+  +------------+-------------------------------------------------------+
+  | name       | description                                           |
+  +------------+-------------------------------------------------------+
+  | clip_url   | copy urls into osx clipboard                          |
+  | rename_tag | renames tag                                           |
+  | tag_tree   | machine tag tree from wildcard machine tag            |
+  | open_url   | open with browser                                     |
+  | table      | displays an ascii table via hirb                      |
+  | view       | displays a hirb view                                  |
+  | uf         | find urls by wildcard or ids                          |
+  | mtrn       | find tags within machine tag fields with regex string |
+  | ut         | find urls with wildcard machine tag                   |
+  | trn        | find tags with regex string                           |
+  | urn        | search urls with regex string                         |
+  | mtr        | reload machine tag config                             |
+  | uc         | create a url                                          |
+  | search     | search commands by name                               |
+  | list       | lists all commands                                    |
+  +------------+-------------------------------------------------------+
+  15 rows in set
 
-  # Article is tagged with rails
-  irb>>Url[1].tag_list
-  => ["article:tags=rails"]
+  # Let's create a bookmark/url with machine tags
+  irb>> Url.create :name=>"http://guides.rubyonrails.org/creating_plugins.html", :tag_list =>"article:tags=rails"
+  +------+------------------------------------------------------+-------------------------+-------------------------------+
+  | id   | name                                                 | description             | quick_mode_tag_list           |
+  +------+------------------------------------------------------+-------------------------+-------------------------------+
+  | 1126 | http://weblog.jamisbuck.org/2008/11/17/vim-follow-up | decent vim/rails advice | article:tutorial;rails;td=vim |
+  +------+------------------------------------------------------+-------------------------+-------------------------------+
+  1 row in set
 
-  TODO
+  # We can retrieve urls with wildcard machine tags. To retrieve our last bookmark 
+  irb>> Url.tagged_with 'article:tags='
+  +------+------------------------------------------------------+-------------------------+-------------------------------+
+  | id   | name                                                 | description             | quick_mode_tag_list           |
+  +------+------------------------------------------------------+-------------------------+-------------------------------+
+  | 1126 | http://weblog.jamisbuck.org/2008/11/17/vim-follow-up | decent vim/rails advice | article:tutorial;rails;td=vim |
+  +------+------------------------------------------------------+-------------------------+-------------------------------+
+  1 row in set
+
+  # Let's generate a tag tree from a wildcard machine tag.
+  # This is a tree of my bookmarks under the namespace gem, with values grouped by their count:
+  irb>> tag_tree 'gem: -v g'
+  gem 
+    app 
+        1: textmate, vim
+    plang
+        1: js
+    std 
+        1: yaml
+    tags
+        9: console
+        4: code_check, ghpages
+        3: visualize, template, api, benchmark
+        2: dt_struct, couchdb, http, introspect
+        1: sandbox, tag, article, rails, db, nomonkey, math, security, pattern, gem, sinatra
+    type
+        22: core
+        17: test
+        10: new, doc
+        9: git
+        7: task
+        4: irb, monkey, misc, mix
+        3: opt, debug, aop
+        2: lang
+        1: science
+    id  
+        1: jekyll
+    td  
+        7: tds
+        1: gist, test
+    site
+        4: ghub, gg
+        1: del, freebase
+
+== Inputting Machine Tags
+
+This app facilitates inputting machine tags by assuming default predicates when none are given. For
+example, instead of inputting site:tags=rails you can just input site:rails (since tags is the
+default predicate). You can also chain together multiple machine tags from the same namespace using
+';' i.e. app:rails;plang=ruby is the same as app:tags=rails,app:plang=ruby. Both of these features
+are from the configurable {has_machine_tags's
+quick_mode}[http://tagaholic.me/has_machine_tags/doc/classes/HasMachineTags/TagList.html].
+
+You can setup more clever predicate defaults by copying config/machine_tags.yml.example to
+config/machine_tags.yml and setting it up as follows:
+
+* :global_predicates:  Contains an array of predicates you want to use globally. All values using a
+  global predicate are assumed to have that global predicate as a default. For example, if lang is a
+  global predicate in the machine tag site:lang=en, en is assumed to have lang as a default
+  predicate in all new inputs.
+
+* :dynamic_predicates: Same as global_predicates but restricted to a namespace.
+
+== Delicious Sync
+
+If you want to sync these bookmarks with delicious, check out the thor tasks at
+lib/tasks/delicious.thor.
 
 == Todo
 
-* Docs!
-* Explore more outline views of machine tag queries.
-* Sync with delicious.com.
+* Tests!
 * Web interface as needed.

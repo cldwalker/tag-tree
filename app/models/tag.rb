@@ -47,6 +47,7 @@ class Tag < ActiveRecord::Base
       global_predicates(reload) + wildcard_predicates(reload)
     end
 
+    # used to determine what default predicates are set depending on namespace and value
     def default_predicates
       (machine_tag_config[:static_predicates] || [] + generated_predicates).map {|e| ["^"+e[0]+"$", e[1]]}
     end

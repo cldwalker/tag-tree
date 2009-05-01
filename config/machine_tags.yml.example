@@ -1,0 +1,18 @@
+:static_predicates:
+  #- - "*:*=(ruby|perl|sh|python|js|flash|cpp|bash)"
+  #  - plang
+:global_predicates:
+  - plang
+  - location
+  - site
+  - os
+  - lang
+  - app
+  - std
+:dynamic_predicates:
+  - site:type=*
+  - gem:type=*
+  - app:type=*
+  - plugin:type=*
+  - person:name=*
+  - lib:plugin=*
