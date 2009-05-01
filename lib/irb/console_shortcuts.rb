@@ -1,6 +1,6 @@
 require 'pp'
-# used with alias
-module ConsoleMethods; end
+require 'lib/irb/core_methods'
+require 'lib/irb/iam'
 
 begin
   # attempt to load a local alias gem
@@ -9,9 +9,9 @@ begin
 rescue LoadError
   require 'alias' # gem install cldwalker-alias
 end
+
+module ConsoleMethods; end #defined for alias
 Alias.init
-#extend delegated methods
-self.extend ConsoleMethods
 
 ConsoleUpdate.enable_named_scope
 
@@ -21,7 +21,10 @@ rescue
   require 'hirb'
 end
 Hirb::View.enable
-self.extend Hirb::Console
 
-require 'lib/irb/core_methods'
+#extend delegated methods
+self.extend ConsoleMethods
+self.extend Hirb::Console
 self.extend CoreMethods
+self.extend Iam
+Iam.register CoreMethods, Hirb::Console, ConsoleMethods

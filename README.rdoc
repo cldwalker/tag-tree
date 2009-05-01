@@ -1,10 +1,9 @@
 == Description
 
-This project is both my current personal bookmark manager and a demo for machine tags.
-Being a bookmark manager, it's two main models are urls and tags. Tags are really machine tags using my {has_machine_tags plugin}[http://github.com/cldwalker/has_machine_tags].
-If you don't know what machine tags are read {this}[http://www.flickr.com/groups/api/discuss/72157594497877875].
-Machine tags are used to retrieve and display the urls in efficient and novel ways.
-Currently this project uses irb as its main interface.
+This is my machine tag based bookmark manager, made mainly for the console. Machine tags are implemented using my {has_machine_tags plugin}[http://github.com/cldwalker/has_machine_tags].
+To use this app you need to know {what machine tags are}[http://tagaholic.me/2009/03/26/what-are-machine-tags.html].
+This app provides machine tag trees created from {wildcard machine
+tags}[http://tagaholic.me/has_machine_tags/doc/classes/HasMachineTags/TagMethods.html].
 
 == Install
   
@@ -15,7 +14,6 @@ Currently this project uses irb as its main interface.
 == Usage
 
   bash> script/console
-  Loading development environment (Rails 2.2.2)
 
   # Let's machine-tag some urls using Url.quick_create() which is aliased to uc()
   # Url.quick_create() delimits its arguments with ',,'

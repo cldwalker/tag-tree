@@ -1,6 +1,6 @@
 # These classes are used for querying machine tags and grouping results as outlines.
 # These methods are for console use and may change quickly.
-class NamespaceGroup #:nodoc:
+class NamespaceTree #:nodoc:
   def initialize(name, options={})
     @name = name.to_s
     @options = options
@@ -128,7 +128,7 @@ class NamespaceGroup #:nodoc:
   
 end
 
-class TagGroup < NamespaceGroup #:nodoc:
+class TagTree < NamespaceTree #:nodoc:
   def namespaces
     tags.map(&:namespace).uniq
   end
@@ -147,7 +147,7 @@ class TagGroup < NamespaceGroup #:nodoc:
   def namespace_groups
     unless @namespace_groups
       @namespace_groups = namespace_tags.map {|name, tags|
-        NamespaceGroup.new(name, :tags=>tags)
+        NamespaceTree.new(name, :tags=>tags)
       }
     end
     @namespace_groups
@@ -158,11 +158,11 @@ class TagGroup < NamespaceGroup #:nodoc:
   end
 end
 
-class QueryGroup < TagGroup #:nodoc:
+class QueryTree < TagTree #:nodoc:
   def namespace_groups
     unless @namespace_groups
       @namespace_groups = namespace_tags.map {|name, tags|
-        NamespaceGroup.new(name, :tags=>tags, :tagged_items=>tagged_items)
+        NamespaceTree.new(name, :tags=>tags, :tagged_items=>tagged_items)
       }
     end
     @namespace_groups
