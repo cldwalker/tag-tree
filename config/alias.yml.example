@@ -1,0 +1,41 @@
+verbose: true
+aliases:
+  constant:
+    Url: U
+    Tag: T
+  instance_method:
+    Url:
+      tag_add_and_remove: tar
+      tag_remove_and_save: tr
+      tag_add_and_save: ta
+      tag_and_save: ts
+      tag_list: tl
+    ConsoleUpdate::SingletonMethods:
+      console_update: cu
+    ConsoleUpdate::NamedScope:
+      console_update: cu
+    CoreMethods:
+      open_url: o
+      clip_url: ucp
+      namespace_tree: nt
+      tag_tree: tt
+      query_tree: qt
+  class_method:
+    Tag:
+      machine_tags: mt
+      namespaces: nsps
+      predicates: ps
+      values: vs
+    Url:
+      tagged_with: tw
+      tagged_with_count: twc
+      find_and_change_machine_tags: fcmt
+  class_to_instance_method:
+    ConsoleMethods:
+      Tag.find_name_by_regexp: trn
+      Tag.search_machine_tag_names: mtrn
+      Tag.machine_tag_reload: mtr
+      Url.quick_create: uc
+      Url.find_name_by_regexp: urn
+      Url.super_tagged_with: ut
+      Url.console_find: uf

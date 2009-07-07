@@ -127,7 +127,7 @@ class Delicious < Thor
   end
 
   def to_full_delicious_url(url)
-    to_delicious_url(url).gsub(/(\.(com|org|br|us|fm|gov|net|lt|edu|ac))$/, '\1/')
+    to_delicious_url(url).gsub(/(\.(com|org|br|us|fm|gov|net|lt|edu|ac|info))$/, '\1/')
   end
 
   def to_delicious_url(url)

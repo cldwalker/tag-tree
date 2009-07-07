@@ -11,7 +11,9 @@ rescue LoadError
 end
 
 module ConsoleMethods; end #defined for alias
-Alias.init
+%w{config/alias.yml ~/.alias/rails.yml ~/.alias.yml}.each {|e|
+  Alias.create :file=>e
+}
 
 ConsoleUpdate.enable_named_scope
 
@@ -20,7 +22,7 @@ begin
 rescue
   require 'hirb'
 end
-Hirb::View.enable
+Hirb.enable
 
 #extend delegated methods
 self.extend ConsoleMethods
