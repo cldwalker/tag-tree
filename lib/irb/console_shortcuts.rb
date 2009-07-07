@@ -11,7 +11,8 @@ rescue LoadError
 end
 
 module ConsoleMethods; end #defined for alias
-%w{config/alias.yml ~/.alias/rails.yml ~/.alias.yml}.each {|e|
+module MainCommands; end
+%w{config/alias.yml ~/.alias/rails.yml}.each {|e|
   Alias.create :file=>e
 }
 
@@ -26,6 +27,7 @@ Hirb.enable
 
 #extend delegated methods
 self.extend ConsoleMethods
+self.extend MainCommands
 self.extend Hirb::Console
 self.extend CoreMethods
 self.extend Iam
