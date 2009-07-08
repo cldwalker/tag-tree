@@ -12,6 +12,7 @@ end
 
 module ConsoleMethods; end #defined for alias
 module MainCommands; end
+module RailsCommands; end
 %w{config/alias.yml ~/.alias/rails.yml}.each {|e|
   Alias.create :file=>e
 }
@@ -26,9 +27,7 @@ end
 Hirb.enable
 
 #extend delegated methods
-self.extend ConsoleMethods
-self.extend MainCommands
-self.extend Hirb::Console
-self.extend CoreMethods
-self.extend Iam
+[ConsoleMethods, MainCommands, RailsCommands, CoreMethods, Iam].each {|e|
+  self.extend e
+}
 Iam.register CoreMethods, Hirb::Console, ConsoleMethods
