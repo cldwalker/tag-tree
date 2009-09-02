@@ -24,7 +24,13 @@ begin
 rescue
   require 'hirb'
 end
-Hirb.enable
+old_config = Hirb.config
+if Hirb::View.enabled?
+  Hirb.disable
+  Hirb.config_file = 'config/hirb.yml'
+  Hirb.config(true)
+end
+Hirb.enable old_config
 
 #extend delegated methods
 [ConsoleMethods, MainCommands, RailsCommands, CoreMethods, Iam].each {|e|
