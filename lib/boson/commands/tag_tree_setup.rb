@@ -15,16 +15,12 @@ module TagTreeSetup
       require 'alias' # gem install cldwalker-alias
     end
 
-    eval %[
-      module ::ConsoleMethods; end #defined for alias
-      module ::MainCommands; end
-      module ::RailsCommands; end
-    ]
+    eval %[ module ::RailsCommands; end ]
 
     %w{config/alias.yml ~/.alias/rails.yml}.each {|e|
       ::Alias.create :file=>e
     }
-    [::ConsoleMethods, ::MainCommands, ::RailsCommands].each {|e| self.send :include, e }
+    [::RailsCommands].each {|e| self.send :include, e }
     #hacky but works
     ::Boson::Universe.send :include, self
     ::Boson::Universe.send :extend_object, Boson.main_object
