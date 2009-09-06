@@ -6,14 +6,16 @@ module TagTreeSetup
     end
   end
 
+  def self.safe_local_require(name)
+    # attempt to load a local gem
+    require 'local_gem'
+    LocalGem.local_require name
+  rescue LoadError
+    require name
+  end
+
   def self.tag_tree_aliases(*args)
-    begin
-      # attempt to load a local alias gem
-      require 'local_gem' # gem install cldwalker-local_gem
-      LocalGem.local_require 'alias' # gem install cldwalker-alias
-    rescue LoadError
-      require 'alias' # gem install cldwalker-alias
-    end
+    safe_local_require 'alias'
 
     eval %[ module ::RailsCommands; end ]
 
@@ -34,11 +36,6 @@ module TagTreeSetup
   private
 
   def load_hirb
-    begin
-      LocalGem.local_require 'hirb'
-    rescue
-      require 'hirb'
-    end
     old_config = ::Hirb.config
     if ::Hirb::View.enabled?
       ::Hirb.disable
