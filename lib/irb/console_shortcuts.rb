@@ -1,5 +1,5 @@
 require 'pp'
-require 'lib/irb/core_methods'
+# require 'lib/irb/core_methods'
 require 'lib/irb/iam'
 
 begin
@@ -13,9 +13,10 @@ end
 module ConsoleMethods; end #defined for alias
 module MainCommands; end
 module RailsCommands; end
-%w{config/alias.yml ~/.alias/rails.yml}.each {|e|
-  Alias.create :file=>e
-}
+
+# %w{config/alias.yml ~/.alias/rails.yml}.each {|e|
+#   Alias.create :file=>e
+# }
 
 ConsoleUpdate.enable_named_scope
 

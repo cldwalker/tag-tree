@@ -1,4 +1,4 @@
-module MyArray
+module ::MyArray
   def amap(*fields)
     map {|e| fields.map {|field| e.send(field) }}
   end
@@ -14,4 +14,8 @@ module MyArray
   end
 end
 
-Array.send :include, MyArray
+module CoreExt
+  def self.included(mod)
+    Array.send :include, ::MyArray
+  end
+end

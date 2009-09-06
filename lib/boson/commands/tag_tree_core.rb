@@ -1,7 +1,9 @@
-require 'irb/method_option_parser'
-require 'namespace_tree'
+module TagTreeCore
+  def self.included(mod)
+    require 'method_option_parser'
+    require 'namespace_tree'
+  end
 
-module CoreMethods
   def rename_tag(old_name, new_name)
     Tag.find_by_name(old_name).update_attribute :name, new_name
   end
@@ -47,7 +49,7 @@ module CoreMethods
 end
 
 # used when migrating from tags to machine tags
-module MigrationMethods
+module TagTreeMigration
   #url-paged
   def up(offset=nil, limit=20)
     columns = [:id, :name, :quick_mode_tag_list]
