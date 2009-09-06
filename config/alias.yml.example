@@ -14,12 +14,6 @@ aliases:
       console_update: cu
     ConsoleUpdate::NamedScope:
       console_update: cu
-    CoreMethods:
-      open_url: o
-      clip_url: ucp
-      namespace_tree: nt
-      tag_tree: tt
-      query_tree: qt
   class_method:
     Tag:
       machine_tags: mt

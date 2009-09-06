@@ -1,4 +1,16 @@
 :defaults:
 - active_record_ext
 - core_ext
+- pp
 - tag_tree_core
+- tag_tree_setup
+:libraries:
+  tag_tree_setup:
+    :init_methods:
+    - setup_tag_tree
+:command_aliases:
+  open_url: o
+  clip_url: ucp
+  namespace_tree: nt
+  tag_tree: tt
+  query_tree: qt
