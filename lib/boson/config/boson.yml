@@ -1,7 +1,6 @@
 :defaults:
 - active_record_ext
 - core_ext
-- pp
 - tag_tree_core
 - tag_tree_setup
 - url_finder_commands
