@@ -16,16 +16,7 @@ module TagTreeSetup
 
   def self.tag_tree_aliases(*args)
     safe_local_require 'alias'
-
-    eval %[ module ::RailsCommands; end ]
-
-    %w{config/alias.yml ~/.alias/rails.yml}.each {|e|
-      ::Alias.create :file=>e
-    }
-    [::RailsCommands].each {|e| self.send :include, e }
-    #hacky but works
-    ::Boson::Universe.send :include, self
-    ::Boson::Universe.send :extend_object, Boson.main_object
+    Alias.create :file=>'config/alias.yml'
   end
 
   def setup_tag_tree
