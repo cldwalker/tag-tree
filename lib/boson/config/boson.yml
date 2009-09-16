@@ -40,7 +40,7 @@
   search_machine_tag_names: mtrn
   machine_tag_reload: mtr
   quick_create: uc
-  url_find_name_by_regexp: urn
+  url_find_by_regexp: urn
   super_tagged_with: ut
   console_find: uf
   console_update: cu

@@ -1,6 +1,5 @@
 module TagTreeCore
   def self.included(mod)
-    require 'method_option_parser'
     require 'namespace_tree'
   end
 
@@ -19,31 +18,19 @@ module TagTreeCore
     IO.popen('pbcopy', 'w+') {|e| e.write(to_copy) }
   end
 
-  def query_tree(*args)
-    args = parse_query_options(args)
-    QueryTree.new(*args)
+  #options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
+  def query_tree(mtag, options={})
+    QueryTree.new(mtag, options)
   end
 
-  def tag_tree(*args)
-    args = parse_query_options(args)
-    TagTree.new(*args)
+  #options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
+  # Displays different tag trees given a wildcard machine tag
+  def tag_tree(mtag, options={})
+    TagTree.new(mtag, options)
   end
 
-  def namespace_tree(*args)
-    args = parse_query_options(args)
-    NamespaceTree.new(*args)
-  end
-
-  private
-  def parse_method_options(args, options)
-    MethodOptionParser.parse(args, options)
-  end
-
-  def parse_query_options(args)
-    if args.size == 1
-      args, options = parse_method_options(args[0], :view=>[:result, :group, :count, :description_result, :tag_result, :value_description])
-      args << options
-    end
-    args
+  #options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
+  def namespace_tree(mtag, options={})
+    NamespaceTree.new(mtag, options)
   end
 end

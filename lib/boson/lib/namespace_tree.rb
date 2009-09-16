@@ -1,6 +1,8 @@
 # These classes are used for querying machine tags and grouping results as outlines.
 # These methods are for console use and may change quickly.
 class NamespaceTree #:nodoc:
+  VIEWS = [:result, :group, :count, :description_result, :tag_result, :value_description]
+
   def initialize(name, options={})
     @name = name.to_s
     @options = options
