@@ -13,6 +13,7 @@ end
 
 module ActiveRecordExt
   def self.included(mod)
+    p 'here?'
     IRB_PROCS[:ar_extensions] = method(:ar_extensions)
   end
 
@@ -42,5 +43,6 @@ module ActiveRecordExt
     ]
     #since Tag was already defined by gems
     ::Tag.class_eval %[include ::ConsoleExtensions]
+    ::Url.class_eval %[include ::ConsoleExtensions]
   end
 end
