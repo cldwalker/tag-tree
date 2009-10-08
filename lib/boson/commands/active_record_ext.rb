@@ -13,7 +13,6 @@ end
 
 module ActiveRecordExt
   def self.included(mod)
-    p 'here?'
     IRB_PROCS[:ar_extensions] = method(:ar_extensions)
   end
 

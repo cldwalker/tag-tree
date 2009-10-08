@@ -11,7 +11,7 @@ class Delicious < Thor
     ENV["RAILS_ENV"] = config[:environment] || 'development'
     require File.dirname(__FILE__) + '/../../config/boot'
     require ::RAILS_ROOT + '/config/environment'
-    require 'lib/irb/active_record_extensions'
+    #require 'lib/irb/active_record_extensions'
   end
 
   desc "push", "Pushes local bookmarks to delicious that have changed since last update."
