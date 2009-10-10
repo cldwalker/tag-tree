@@ -23,7 +23,9 @@ Rails::Initializer.run do |config|
   # Specify gems that this application depends on. 
   # They can then be installed with "rake gems:install" on new installations.
    config.gem "cldwalker-has_machine_tags", :source=>"http://gems.github.com", :lib=>"has_machine_tags"
-   config.gem "boson"
+   config.gem "alias"
+   config.gem "hirb"
+   #config.gem "boson"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
