@@ -25,27 +25,30 @@ Note: The ascii tables are what you actually see in your console, compliments of
   bash> script/console
 
   # list commands that are available in console
-  irb>> list
-  +------------+-------------------------------------------------------+
-  | name       | description                                           |
-  +------------+-------------------------------------------------------+
-  | clip_url   | copy urls into osx clipboard                          |
-  | rename_tag | renames tag                                           |
-  | tag_tree   | machine tag tree from wildcard machine tag            |
-  | open_url   | open with browser                                     |
-  | table      | displays an ascii table via hirb                      |
-  | view       | displays a hirb view                                  |
-  | uf         | find urls by wildcard or ids                          |
-  | mtrn       | find tags within machine tag fields with regex string |
-  | ut         | find urls with wildcard machine tag                   |
-  | trn        | find tags with regex string                           |
-  | urn        | search urls with regex string                         |
-  | mtr        | reload machine tag config                             |
-  | uc         | create a url                                          |
-  | search     | search commands by name                               |
-  | list       | lists all commands                                    |
-  +------------+-------------------------------------------------------+
-  15 rows in set
+  irb>> commands
+  +--------------------------+----------------+-------+-----------------------+-----------------------------------------------------------+
+  | full_name                | lib            | alias | usage                 | description                                               |
+  +--------------------------+----------------+-------+-----------------------+-----------------------------------------------------------+
+  | machine_tag_reload       | tag_tree_core  | mtr   |                       | reload machine tag config                                 |
+  | console_find             | tag_tree_core  | uf    |                       | find urls by wildcard or ids                              |
+  | search_machine_tag_names | tag_tree_core  | mtrn  |                       | find tags within machine tag fields with regex string     |
+  | tag_tree                 | tag_tree_core  | tt    | [mtag][--view=VIEW]   | Displays different tag trees given a wildcard machine tag |
+  | quick_create             | tag_tree_core  | uc    |                       | quickly create a url                                      |
+  | rename_tag               | tag_tree_core  |       | [old_name] [new_name] |                                                           |
+  | clip_url                 | tag_tree_core  | ucp   | [*args]               |                                                           |
+  | tag_find_name_by_regexp  | tag_tree_core  | trn   |                       | find tags with regex string                               |
+  | open_url                 | tag_tree_core  | o     | [*args]               | open url object id                                        |
+  | url_find_by_regexp       | tag_tree_core  | urn   |                       | search urls with regex string                             |
+  | super_tagged_with        | tag_tree_core  | ut    |                       | find urls with wildcard machine tag                       |
+  | values                   | tag_tree_core  | vs    |                       |                                                           |
+  | namespaces               | tag_tree_core  | nsps  |                       |                                                           |
+  | query_tree               | tag_tree_core  | qt    | [mtag][--view=VIEW]   |                                                           |
+  | predicates               | tag_tree_core  | ps    |                       |                                                           |
+  | machine_tags             | tag_tree_core  | mt    |                       |                                                           |
+  | namespace_tree           | tag_tree_core  | nt    | [mtag][--view=VIEW]   |                                                           |
+  | setup_tag_tree           | tag_tree_setup |       |                       |                                                           |
+  +--------------------------+----------------+-------+-----------------------+-----------------------------------------------------------+
+  18 rows in set
 
   # Let's create a bookmark/url with machine tags
   irb>> Url.create :name=>"http://guides.rubyonrails.org/creating_plugins.html", :tag_list =>"article:tags=rails"
