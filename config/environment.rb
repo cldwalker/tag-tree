@@ -25,7 +25,7 @@ Rails::Initializer.run do |config|
    config.gem "cldwalker-has_machine_tags", :source=>"http://gems.github.com", :lib=>"has_machine_tags"
    config.gem "alias"
    config.gem "hirb"
-   #config.gem "boson"
+   #config.gem "boson" #can't enable yet b/c latest has_machine_tags doesn't load
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

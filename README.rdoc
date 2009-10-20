@@ -12,7 +12,7 @@ posts}[http://tagaholic.me/2009/04/26/machine-tagging-with-delicious.html].
 
 == Setup
   
-  1. Install necessary gems: `rake gems:install`
+  1. Install necessary gems: `gem install boson && rake gems:install`
   2. Copy config/database.yml.example to config/database.yml and setup your db as needed.
   3. Run migrations: `rake db:migrate`
   4. Optionally setup your own commandline aliases at config/alias.yml using config/alias.yml.example as an example.

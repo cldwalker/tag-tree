@@ -12,8 +12,8 @@ module ::ConsoleExtensions
 end
 
 module ActiveRecordExt
-  def self.included(mod)
-    IRB_PROCS[:ar_extensions] = method(:ar_extensions)
+  def self.after_included
+    IRB_PROCS[:ar_extensions] = method(:ar_extensions) if Object.const_defined?(:IRB_PROCS)
   end
 
   def self.ar_extensions(*args)
