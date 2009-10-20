@@ -1,4 +1,4 @@
-:defaults:
+:console_defaults:
 - active_record_ext
 - core_ext
 - tag_tree_core
