@@ -41,9 +41,6 @@
       namespaces: Tag.namespaces
       predicates: tag.predicates
       values: Tag.values
-  tag_tree_setup:
-    :init_methods:
-    - setup_tag_tree
 :command_aliases:
   open_url: o
   clip_url: ucp

@@ -15,7 +15,7 @@ posts}[http://tagaholic.me/2009/04/26/machine-tagging-with-delicious.html].
   1. Install necessary gems: `rake gems:install`
   2. Copy config/database.yml.example to config/database.yml and setup your db as needed.
   3. Run migrations: `rake db:migrate`
-  4. Optionally setup your own commandline aliases at config/aliases.yml using config/aliases.yml.example as an example.
+  4. Optionally setup your own commandline aliases at config/alias.yml using config/alias.yml.example as an example.
 
 == Usage
 
@@ -25,7 +25,7 @@ Note: The ascii tables are what you actually see in your console, compliments of
   bash> script/console
 
   # list commands that are available in console
-  irb>> commands
+  irb>> commands '-q=l tag_tree'
   +--------------------------+----------------+-------+-----------------------+-----------------------------------------------------------+
   | full_name                | lib            | alias | usage                 | description                                               |
   +--------------------------+----------------+-------+-----------------------+-----------------------------------------------------------+
