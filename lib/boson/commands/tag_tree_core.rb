@@ -8,16 +8,21 @@ module TagTreeCore
     Tag.find_by_name(old_name).update_attribute :name, new_name
   end
 
-  # Open urls in osx browser with url id
+  # Open urls specified by id in browser
   def open_url(*args)
     urls = Url.console_find(args).map(&:name)
-    system(*(['open'] + urls))
+    browser *urls
+    urls.join(' ')
   end
 
   # Copy urls into osx clipboard
   def clip_url(*args)
     to_copy = Url.console_find(args).map(&:name).join(" ")
     IO.popen('pbcopy', 'w+') {|e| e.write(to_copy) }
+  end
+
+  def tag_console_update(name)
+    tag_find_name_by_regexp(name).console_update
   end
 
   #@options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}

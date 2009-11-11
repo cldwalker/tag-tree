@@ -11,7 +11,7 @@ class Delicious < Thor
     ENV["RAILS_ENV"] = config[:environment] || 'development'
     require File.dirname(__FILE__) + '/../../config/boot'
     require ::RAILS_ROOT + '/config/environment'
-    #require 'lib/irb/active_record_extensions'
+    # require 'lib/boson/commands/active_record_ext'
   end
 
   desc "push", "Pushes local bookmarks to delicious that have changed since last update."
@@ -65,7 +65,7 @@ class Delicious < Thor
 
   desc "bundle", "Puts tags into bundles by namespace. Nonmachine tags go into normal_tags bundle."
   def bundle
-    Tag.namespaces.each {|e| @client.bundles_set e, Tag.find_name_by_regexp("#{e}:").map(&:name) }
+    Tag.namespaces.each {|e| @client.bundles_set e, Tag.find(:all, :conditions=>["name REGEXP ?", "#{e}:"]).map(&:name) }
     normal_tags = @client.tags_get.select {|e| e.name !~ /:.*=/ }.map(&:name)
     @client.bundles_set 'normal_tags', normal_tags
   end

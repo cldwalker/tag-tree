@@ -49,6 +49,7 @@
   tag_and_save: ts
   tag_list: tl
   tag_find_name_by_regexp: trn
+  tag_console_update: tcu
   search_machine_tag_names: mtrn
   machine_tag_reload: mtr
   quick_create: uc
