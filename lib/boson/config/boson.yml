@@ -4,13 +4,35 @@
 - tag_tree_core
 - tag_tree_setup
 - url_finder_commands
+- tag
 :libraries:
-  tag_tree_core:
+  tag:
+    :class_commands:
+      tag_find_name_by_regexp: Tag.find_name_by_regexp
+      search_machine_tag_names: Tag.search_machine_tag_names
+      machine_tag_reload: Tag.machine_tag_reload
+      machine_tags: Tag.machine_tags
+      namespaces: Tag.namespaces
+      predicates: Tag.predicates
+      values: Tag.values
     :commands:
       tag_find_name_by_regexp:
         :description: Find tags with regex string
       search_machine_tag_names:
         :description: Find tags within machine tag fields with regex string
+      machine_tag_reload:
+        :description: Reload machine tag config
+    :command_aliases:
+      tag_console_update: tcu
+      tag_find_name_by_regexp: trn
+      search_machine_tag_names: mtrn
+      machine_tag_reload: mtr
+      machine_tags: mt
+      namespaces: nsps
+      predicates: ps
+      values: vs
+  tag_tree_core:
+    :commands:
       quick_create:
         :description: Quickly create a url
       url_find_by_regexp:
@@ -19,41 +41,25 @@
         :description: Find urls with wildcard machine tag
       console_find:
         :description: Find urls by wildcard or ids
-      machine_tag_reload:
-        :description: Reload machine tag config
     :class_commands:
-      tag_find_name_by_regexp: Tag.find_name_by_regexp
-      search_machine_tag_names: Tag.search_machine_tag_names
-      machine_tag_reload: Tag.machine_tag_reload
       quick_create: Url.quick_create
       url_find_by_regexp: Url.find_name_by_regexp
       super_tagged_with: Url.super_tagged_with
       console_find: Url.console_find
-      machine_tags: Tag.machine_tags
-      namespaces: Tag.namespaces
-      predicates: tag.predicates
-      values: Tag.values
+    :command_aliases:
+      open_url: o
+      clip_url: ucp
+      namespace_tree: nt
+      tag_tree: tt
+      query_tree: qt
+      quick_create: uc
+      url_find_by_regexp: urn
+      super_tagged_with: ut
+      console_find: uf
 :command_aliases:
-  open_url: o
-  clip_url: ucp
-  namespace_tree: nt
-  tag_tree: tt
-  query_tree: qt
-  machine_tags: mt
-  namespaces: nsps
-  predicates: ps
-  values: vs
   tag_add_and_remove: tar
   tag_remove_and_save: tr
   tag_add_and_save: ta
   tag_and_save: ts
   tag_list: tl
-  tag_find_name_by_regexp: trn
-  tag_console_update: tcu
-  search_machine_tag_names: mtrn
-  machine_tag_reload: mtr
-  quick_create: uc
-  url_find_by_regexp: urn
-  super_tagged_with: ut
-  console_find: uf
   console_update: cu

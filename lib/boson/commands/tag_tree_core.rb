@@ -3,11 +3,6 @@ module TagTreeCore
     require 'namespace_tree'
   end
 
-  # Renames tag
-  def rename_tag(old_name, new_name)
-    Tag.find_by_name(old_name).update_attribute :name, new_name
-  end
-
   # Open urls specified by id in browser
   def open_url(*args)
     urls = Url.console_find(args).map(&:name)
@@ -19,10 +14,6 @@ module TagTreeCore
   def clip_url(*args)
     to_copy = Url.console_find(args).map(&:name).join(" ")
     IO.popen('pbcopy', 'w+') {|e| e.write(to_copy) }
-  end
-
-  def tag_console_update(name)
-    tag_find_name_by_regexp(name).console_update
   end
 
   #@options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
