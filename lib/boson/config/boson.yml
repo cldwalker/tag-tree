@@ -1,12 +1,18 @@
+:bin_defaults:
+- tag_tree_setup
 :console_defaults:
-- active_record_ext
+- tag_tree_setup
 - core_ext
 - tag_tree_core
-- tag_tree_setup
 - url_finder_commands
 - tag
 :libraries:
+  url_finder_commands:
+    :dependencies:
+    - active_record_ext
   tag:
+    :dependencies:
+    - active_record_ext
     :class_commands:
       tag_find_name_by_regexp: Tag.find_name_by_regexp
       search_machine_tag_names: Tag.search_machine_tag_names
@@ -32,6 +38,8 @@
       predicates: ps
       values: vs
   tag_tree_core:
+    :dependencies:
+    - active_record_ext
     :commands:
       quick_create:
         :description: Quickly create a url

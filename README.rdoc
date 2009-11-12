@@ -124,8 +124,8 @@ config/machine_tags.yml and setting it up as follows:
 
 == Delicious Sync
 
-If you want to sync these bookmarks with delicious, check out the thor tasks at
-lib/tasks/delicious.thor.
+If you want to sync these bookmarks with delicious, there's a delicious library that depends on the
+www-delicious gem.
 
 == Todo
 

@@ -12,8 +12,16 @@ module ::ConsoleExtensions
 end
 
 module ActiveRecordExt
+  def self.config
+    {:dependencies=>'start_rails'}
+  end
+
   def self.after_included
-    IRB_PROCS[:ar_extensions] = method(:ar_extensions) if Object.const_defined?(:IRB_PROCS)
+    if Object.const_defined?(:IRB_PROCS)
+      IRB_PROCS[:ar_extensions] = method(:ar_extensions)
+    else
+      ar_extensions
+    end
   end
 
   def self.ar_extensions(*args)
