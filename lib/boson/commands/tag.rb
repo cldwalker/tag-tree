@@ -9,6 +9,7 @@ module TagLib
     Tag.find_name_by_regexp(name).console_update
   end
 
+  # @config :default_option=>'type'
   # @render_options :change_fields=>{:default=>{0=>'name', 1=>'count'}}
   # @options :type=>{:type=>:string, :values=>%w{namespace_counts predicate_counts value_counts},
   #  :required=>true, :default=>'namespace_counts'}

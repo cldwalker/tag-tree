@@ -56,7 +56,6 @@
       console_find: Url.console_find
     :command_aliases:
       open_url: o
-      clip_url: ucp
       namespace_tree: nt
       tag_tree: tt
       query_tree: qt

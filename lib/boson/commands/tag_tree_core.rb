@@ -3,17 +3,12 @@ module TagTreeCore
     require 'namespace_tree'
   end
 
+  # @config :global_options=>true
   # Open urls specified by id in browser
   def open_url(*args)
     urls = Url.console_find(args).map(&:name)
     browser *urls
     urls.join(' ')
-  end
-
-  # Copy urls into osx clipboard
-  def clip_url(*args)
-    to_copy = Url.console_find(args).map(&:name).join(" ")
-    IO.popen('pbcopy', 'w+') {|e| e.write(to_copy) }
   end
 
   #@options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
