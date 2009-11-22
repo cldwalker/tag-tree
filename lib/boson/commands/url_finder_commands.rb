@@ -7,6 +7,6 @@ module UrlFinderCommands
         ::Url.find(finder).#{m}(*args)
         end
       ]
-  end.map.join("\n")
+  end.join("\n")
   module_eval generated_methods
 end

@@ -13,7 +13,7 @@ end
 
 module ActiveRecordExt
   def self.config
-    {:dependencies=>'start_rails'}
+    {:dependencies=>['start_rails']}
   end
 
   def self.after_included
