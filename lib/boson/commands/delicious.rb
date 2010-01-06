@@ -9,11 +9,12 @@ module Delicious
     {:namespace=>'d', :dependencies=>['active_record_ext'], :object_methods=>false}
   end
 
-  # @options :pretend=>:boolean
+  # @options :pretend=>:boolean, :diff=>:boolean
   # Pushes local bookmarks to delicious that have changed since last update
   def push(options={})
     if Delicious.store[:updated_at]
-      urls_to_add = Url.find(:all, :conditions=>["updated_at >= ?", Delicious.store[:updated_at]])
+      urls_to_add = options[:diff] ? diff :
+        Url.find(:all, :conditions=>["updated_at >= ?", Delicious.store[:updated_at]])
       existing_urls = client.posts_all.map {|e| e.url.to_s }
       urls_to_delete = urls_to_add.select {|e|
         existing_urls.include?(Delicious.to_full_delicious_url(e.name))

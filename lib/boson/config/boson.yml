@@ -46,6 +46,13 @@
       url_find_by_regexp:
         :description: Search urls with regex string
       super_tagged_with:
+        :args: *
+        :render_options:
+          :fields:
+          - id
+          - name
+          - description
+          - quick_mode_tag_list
         :description: Find urls with wildcard machine tag
       console_find:
         :description: Find urls by wildcard or ids
