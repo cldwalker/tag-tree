@@ -45,6 +45,8 @@
         :description: Quickly create a url
       url_find_by_regexp:
         :description: Search urls with regex string
+        :global_options: true
+        :args: *
       super_tagged_with:
         :args: *
         :render_options:
@@ -62,7 +64,6 @@
       super_tagged_with: Url.super_tagged_with
       console_find: Url.console_find
     :command_aliases:
-      open_url: o
       namespace_tree: nt
       tag_tree: tt
       query_tree: qt
