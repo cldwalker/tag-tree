@@ -17,6 +17,7 @@ module TagTreeCore
     QueryTree.new(mtag, options)
   end
 
+  # @config :render_options=>'NamespaceTree'
   #@options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
   # Displays different tag trees given a wildcard machine tag
   def tag_tree(mtag, options={})
