@@ -3,6 +3,12 @@ module TagTreeCore
     require 'namespace_tree'
   end
 
+  # @options :fields=>{:values=>%w{id name description created_at updated_at}, :default=>['name']}
+  # Multiple regexp queries ORed together
+  def url_query(val, options={})
+    Url.find_any_by_regexp(val, options[:fields])
+  end
+
   # @config :global_options=>true
   # Open urls specified by id in browser
   def open_url(*args)
