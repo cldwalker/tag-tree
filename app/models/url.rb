@@ -47,8 +47,7 @@ class Url < ActiveRecord::Base
       tagged_with(*args).count
     end
     
-    def super_tagged_with(*args)
-      query = args.shift
+    def super_tagged_with(query, *args)
       results = query.split(/\s*\+\s*/).map {|e| Url.tagged_with(e, *args) }
       results.size > 1 ? results.inject {|t,v| t & v } : results.flatten
     end

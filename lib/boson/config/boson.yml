@@ -27,7 +27,6 @@
         :description: Reload machine tag config
     :command_aliases:
       tag_query: tq
-      tag_console_update: tcu
       search_machine_tag_names: mtrn
       machine_tag_reload: mtr
       machine_tags: mt
@@ -45,15 +44,10 @@
         :args: *
       super_tagged_with:
         :args: *
-        :render_options:
-          :fields:
-          - id
-          - name
-          - description
-          - quick_mode_tag_list
+        :render_options: Url
         :description: Find urls with wildcard machine tag
       console_find:
-        :description: Find urls by wildcard or ids
+        :description: Find urls by wildcard tag or ids
     :class_commands:
       quick_create: Url.quick_create
       super_tagged_with: Url.super_tagged_with

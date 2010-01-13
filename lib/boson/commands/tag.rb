@@ -4,15 +4,13 @@ module TagLib
     Tag.find_by_name(old_name).update_attribute :name, new_name
   end
 
-  # @options :fields=>{:values=>%w{id name description created_at namespace predicate value}, :default=>['name']}
+  # @options :fields=>{:values=>%w{id name description created_at namespace predicate value}, :default=>['name']},
+  #  :console_update=>:boolean
   # Multiple regexp queries ORed together
   def tag_query(val, options={})
-    Tag.find_any_by_regexp(val, options[:fields])
-  end
-
-  # Updates regex of tags with console_update
-  def tag_console_update(name)
-    Tag.find_any_by_regexp(name).console_update
+    results = Tag.find_any_by_regexp(val, options[:fields])
+    results.console_update if options[:console_update]
+    results
   end
 
   # @config :default_option=>'type'
