@@ -3,6 +3,7 @@ aliases:
   constant:
     Url: U
     Tag: T
+    DefaultPredicate: D
   instance_method:
     Url:
       tag_add_and_remove: tar
@@ -14,4 +15,3 @@ aliases:
     Url:
       tagged_with: tw
       tagged_with_count: twc
-      find_and_change_machine_tags: fcmt

@@ -1,6 +1,3 @@
-:static_predicates:
-  #- - "*:*=(ruby|perl|sh|python|js|flash|cpp|bash)"
-  #  - plang
 :global_predicates:
   - plang
   - location
