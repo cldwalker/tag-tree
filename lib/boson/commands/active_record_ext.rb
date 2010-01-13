@@ -5,6 +5,19 @@ module ::ConsoleExtensions
         conditions = fields.map {|f| "#\{f} REGEXP ?" }.join(" OR ")
         {:conditions=>[conditions, *Array.new(fields.size, query) ]}
       }
+
+      def self.console_find(*queries)
+        options = queries[-1].is_a?(Hash) ? queries.pop : {}
+        queries = queries[0].to_a if queries[0].is_a?(Range)
+        if queries[0].is_a?(Integer)
+          results = queries.map {|e| find(e) rescue nil }.compact
+        else
+          results = queries[0] ? find_by_regexp(queries[0], options[:columns] || ['name']).
+            find(:all, options.slice(:limit, :offset, :conditions)) :
+            find(:all, options.slice(:limit, :offset, :conditions))
+        end
+        results
+      end
     ]
   end
 end

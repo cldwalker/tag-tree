@@ -9,7 +9,7 @@ class Tag < ActiveRecord::Base
       (namespaces + predicates + values).uniq
     end
   
-    def search_machine_tag_names(name)
+    def search_machine_tag_names(name='')
       machine_tag_names.grep(/#{name}/)
     end
     
@@ -25,7 +25,7 @@ class Tag < ActiveRecord::Base
     def global_predicates(reload=false)
       if reload || @global_predicates.nil?
         @global_predicates = machine_tag_config[:global_predicates].map {|e| 
-          mtags = machine_tags(Tag.build_machine_tag('*', e, '*')); ["*:*=(#{mtags.map(&:value).uniq.join('|')})", e]}
+          mtags = machine_tags(build_machine_tag('*', e, '*')); ["*:*=(#{mtags.map(&:value).uniq.join('|')})", e]}
       end
       @global_predicates
     end

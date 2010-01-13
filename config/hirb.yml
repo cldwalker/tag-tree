@@ -2,10 +2,20 @@
   Url:
     :options:
       :fields:
-        - id
-        - name
-        - description
-        - quick_mode_tag_list
+      - id
+      - name
+      - description
+      - quick_mode_tag_list
+  Tag:
+    :options:
+      :fields:
+      - id
+      - name
+      - description
+      - created_at
+      - namespace
+      - predicate
+      - value
   NamespaceTree:
     :class: Hirb::Helpers::Tree
     :output_method: to_tree

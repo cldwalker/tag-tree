@@ -5,10 +5,11 @@ module TagLib
   end
 
   # @options :columns=>{:values=>%w{id name description created_at namespace predicate value}, :default=>['name']},
-  #  :console_update=>:boolean
+  #  :console_update=>:boolean, :limit=>:numeric, :offset=>:numeric
+  # @config :render_options=>"Tag"
   # Multiple regexp queries ORed together
-  def tag_query(val, options={})
-    results = Tag.find_by_regexp(val, options[:columns])
+  def tag_find(val, options={})
+    results = Tag.console_find(val, options)
     Tag.console_update(results) if options[:console_update]
     results
   end
@@ -20,5 +21,10 @@ module TagLib
   # Lists machine tag counts by machine tag part
   def tag_stats(options={})
     Tag.send(options[:type]).map {|e| [e.counter, e.count.to_i] }
+  end
+
+  # @render_options :change_fields =>['predicate', 'regex']
+  def default_predicates
+    Tag.default_predicates.map {|e| e.reverse }
   end
 end

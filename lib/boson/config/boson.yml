@@ -23,11 +23,11 @@
       - machine_tag_reload
     :commands:
       search_machine_tag_names:
-        :description: Find tags within machine tag fields with regex string
+        :description: Find tag names within machine tag fields with regex string
       machine_tag_reload:
         :description: Reload machine tag config
     :command_aliases:
-      tag_query: tq
+      tag_find: tf
       search_machine_tag_names: mtrn
       machine_tag_reload: mtr
       machine_tags: mt
@@ -40,19 +40,6 @@
     :commands:
       quick_create:
         :description: Quickly create a url
-      gsub_tags:
-        :description: Substitute tags for given urls
-        :args: 4
-        :render_options:
-          :fields:
-          - :id
-          - :old_tags
-          - :new_tags
-        :options:
-          :save:
-            :type: :boolean
-            :alias:
-            - S
       super_tagged_with:
         :args: *
         :options:
@@ -86,7 +73,6 @@
       - quick_create
       - super_tagged_with
       - console_find
-      - gsub_tags
       - console_update
     :command_aliases:
       open_url: ou

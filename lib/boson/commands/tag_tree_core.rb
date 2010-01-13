@@ -11,6 +11,19 @@ module TagTreeCore
     urls.join(' ')
   end
 
+  # @render_options :fields=>[:id, :old_tags, :new_tags]
+  # @options [:save, :S]=>:boolean
+  # Renames tags of given urls with gsub
+  def gsub_tags(urls, regex, substitution, options={})
+    urls.map do |e|
+      new_tag_list = e.tag_list.map {|f| f.gsub(regex, substitution)}
+      if options[:save]
+        e.tag_and_save(new_tag_list)
+      end
+      {:id=>e.id, :old_tags=>e.tag_list, :new_tags=>new_tag_list.join(', ')}
+    end
+  end
+
   #@options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
   # Displays query tree given wildcard machine tag
   def query_tree(mtag, options={})
