@@ -14,12 +14,13 @@
     :dependencies:
     - active_record_ext
     :class_commands:
-      search_machine_tag_names: Tag.search_machine_tag_names
-      machine_tag_reload: Tag.machine_tag_reload
-      machine_tags: Tag.machine_tags
-      namespaces: Tag.namespaces
-      predicates: Tag.predicates
-      values: Tag.values
+      Tag:
+      - machine_tags
+      - namespaces
+      - values
+      - predicates
+      - search_machine_tag_names
+      - machine_tag_reload
     :commands:
       search_machine_tag_names:
         :description: Find tags within machine tag fields with regex string
@@ -86,6 +87,7 @@
       - super_tagged_with
       - console_find
       - gsub_tags
+      - console_update
     :command_aliases:
       open_url: ou
       namespace_tree: nt
@@ -101,3 +103,4 @@
   tag_and_save: ts
   tag_list: tl
   console_update: cu
+  regex_update_attribute: rua

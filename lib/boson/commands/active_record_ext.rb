@@ -35,12 +35,11 @@ module ActiveRecordExt
         alias_method :f, :find
       end
 
-      def rua(name, value)
-        require 'abbrev'
-        if name = self.class.column_names.abbrev[name.to_s]
+      def regex_update_attribute(field, value)
+        if name = self.class.column_names.sort.find {|e| e[/^\#{field}/] }
           update_attribute(name, value)
         else
-          puts "'\#{name}' doesn't match a column"
+          puts "'\#{field}' doesn't match a column"
         end
       end
     ]
