@@ -1,10 +1,10 @@
 module ::ConsoleExtensions
   def self.included(base)
     base.class_eval %[
-      def self.find_any_by_regexp(value, fields)
+      named_scope :find_by_regexp, lambda {|query,fields|
         conditions = fields.map {|f| "#\{f} REGEXP ?" }.join(" OR ")
-        find(:all, :conditions=>[conditions, *Array.new(fields.size, value) ])
-      end
+        {:conditions=>[conditions, *Array.new(fields.size, query) ]}
+      }
     ]
   end
 end

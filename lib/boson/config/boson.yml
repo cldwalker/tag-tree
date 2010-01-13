@@ -39,26 +39,59 @@
     :commands:
       quick_create:
         :description: Quickly create a url
-      url_query:
-        :render_options: Url
-        :args: *
+      gsub_tags:
+        :description: Substitute tags for given urls
+        :args: 4
+        :render_options:
+          :fields:
+          - :id
+          - :old_tags
+          - :new_tags
+        :options:
+          :save:
+            :type: :boolean
+            :alias:
+            - S
       super_tagged_with:
         :args: *
+        :options:
+          :conditions:
+            :desc: Sql condition
+            :alias:
+            - c
+          :or:
+            :type: :boolean
+            :desc: Join queries by OR
         :render_options: Url
-        :description: Find urls with wildcard machine tag
+        :description: Find urls by multiple wildcard machine tags. Defaults to AND-ing queries.
       console_find:
-        :description: Find urls by wildcard tag or ids
+        :render_options: Url
+        :options:
+          :limit: :numeric
+          :offset: :numeric
+          :columns:
+            :default:
+            - name
+            :values:
+            - id
+            - name
+            - description
+            - created_at
+            - updated_at
+        :args: *
+        :description: Find urls by ids, range of ids or regex search of fields
     :class_commands:
-      quick_create: Url.quick_create
-      super_tagged_with: Url.super_tagged_with
-      console_find: Url.console_find
+      Url:
+      - quick_create
+      - super_tagged_with
+      - console_find
+      - gsub_tags
     :command_aliases:
       open_url: ou
       namespace_tree: nt
       tag_tree: tt
       query_tree: qt
       quick_create: uc
-      url_query: uq
       super_tagged_with: ut
       console_find: uf
 :command_aliases:

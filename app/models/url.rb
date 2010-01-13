@@ -19,14 +19,15 @@ class Url < ActiveRecord::Base
   end
 
   class<<self
-    def console_find(*args)
-      args.flatten!
-      if args[0].is_a?(Integer)
-        results = args.map {|e| find(e)}
-      elsif args[0].is_a?(ActiveRecord::Base)
-        results = args
+    def console_find(*queries)
+      options = queries[-1].is_a?(Hash) ? queries.pop : {}
+      queries = queries[0].to_a if queries[0].is_a?(Range)
+      if queries[0].is_a?(Integer)
+        results = queries.map {|e| find(e) rescue nil }.compact
       else
-        results = tagged_with(*args)
+        results = queries[0] ? find_by_regexp(queries[0], options[:columns] || ['name']).
+          find(:all, options.slice(:limit, :offset, :conditions)) :
+          find(:all, options.slice(:limit, :offset, :conditions))
       end
       results
     end
@@ -47,45 +48,21 @@ class Url < ActiveRecord::Base
       tagged_with(*args).count
     end
     
-    def super_tagged_with(query, *args)
-      results = query.split(/\s*\+\s*/).map {|e| Url.tagged_with(e, *args) }
-      results.size > 1 ? results.inject {|t,v| t & v } : results.flatten
+    def super_tagged_with(*tags)
+      options = tags[-1].is_a?(Hash) ? tags.pop : {}
+      results = tags.map {|e| Url.tagged_with(e, options.slice(:conditions)) }
+      return results.flatten if results.size <= 1
+      options[:or] ? results.flatten.uniq : results.inject {|t,v| t & v }
     end
 
-    def find_and_change_machine_tags(*args)
-      options = args[-1].is_a?(Hash) ? args.pop : {}
-      results = console_find(args)
-      namespace = results.select {|e| 
-        nsp = e.tag_list.select {|f| break $1 if f =~ /^(\S+):/}
-         break nsp if !nsp.empty?
-        false
-      }
-      if namespace
-        results.each {|e|
-          new_tag_list = e.tag_list.map {|f|
-            f.include?("#{namespace}:") ? f : "#{namespace}:#{f}"
-          }
-          p [e.id, e.tag_list, new_tag_list]
-          if options[:save]
-            e.tag_and_save(new_tag_list)
-          end
-        }
-      else
-        puts "no namespace detected"
-      end
-      nil
-    end
-
-    def find_and_regex_change_tags(find_args, regex, substitution, options={})
-      results = Url.console_find(find_args)
-      results.each do |e|
+    def gsub_tags(urls, regex, substitution, options={})
+      urls.map do |e|
         new_tag_list = e.tag_list.map {|f| f.gsub(regex, substitution)}
-        p [e.id, e.tag_list, new_tag_list]
         if options[:save]
           e.tag_and_save(new_tag_list)
         end
+        {:id=>e.id, :old_tags=>e.tag_list, :new_tags=>new_tag_list.join(', ')}
       end
-      nil
     end
   end  
 end

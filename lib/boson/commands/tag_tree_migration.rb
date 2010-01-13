@@ -24,11 +24,28 @@ module TagTreeMigration
     }.select {|e| e[1].include?('tags')}
   end
 
-  def convert(*args)
-    Url.find_and_regex_change_tags(args[0], /^/, args[2] || 'site:', {:save=>args[1] || false})
-  end
-
-  def pconvert(*args)
-    Url.find_and_change_machine_tags(*(args << {:save=>true}))
+  # @options :save=>:boolean
+  # @desc Detects if urls have a machine tag and if they do, applies the common namespace to
+  # remaining normal tags
+  def convert_to_machine_tags(urls, options={})
+    namespace = urls.select {|e| 
+      nsp = e.tag_list.select {|f| break $1 if f =~ /^(\S+):/}
+       break nsp if !nsp.empty?
+      false
+    }
+    if namespace
+      urls.map {|e|
+        new_tag_list = e.tag_list.map {|f|
+          f.include?("#{namespace}:") ? f : "#{namespace}:#{f}"
+        }
+        p [e.id, e.tag_list, new_tag_list]
+        if options[:save]
+          e.tag_and_save(new_tag_list)
+        end
+      }
+    else
+      puts "no namespace detected"
+    end
+    nil
   end
 end
