@@ -20,6 +20,7 @@
       - values
       - predicates
       - search_machine_tag_names
+      DefaultPredicate:
       - machine_tag_reload
     :commands:
       search_machine_tag_names:

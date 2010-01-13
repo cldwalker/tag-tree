@@ -7,14 +7,10 @@ class Url < ActiveRecord::Base
 
   # override has_machine_tags's method to provide a default predicate
   def current_tag_list(list)
-    HasMachineTags::TagList.new(list, :quick_mode=>self.quick_mode, :default_predicate=> proc {|*args| default_predicate(*args) })
+    HasMachineTags::TagList.new(list, :quick_mode=>self.quick_mode, :default_predicate=>
+      proc {|*args| DefaultPredicate.find(*args) })
   end
 
-  def default_predicate(value, namespace)
-    mtag_to_match = Tag.build_machine_tag(namespace, '*', value)
-    (match = Tag.default_predicates.find {|e| mtag_to_match[/#{e[0].gsub('*', '.*')}/]}) ? match[1] : 'tags'
-  end
-  
   def update_timestamp
     self.updated_at = (self.class.default_timezone == :utc ? Time.now.utc : Time.now)
   end

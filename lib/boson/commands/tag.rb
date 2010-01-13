@@ -25,6 +25,6 @@ module TagLib
 
   # @render_options :change_fields =>['predicate', 'regex']
   def default_predicates
-    Tag.default_predicates.map {|e| e.reverse }
+    DefaultPredicate.default_predicates.map {|e| e.reverse }
   end
 end
