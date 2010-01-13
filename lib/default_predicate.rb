@@ -1,23 +1,36 @@
-# Determines default predicates for machine tagged content based on rules in config/machine_tags.yml
+# Determines default predicates for machine tags by generating filters (regexs) from rules in config/machine_tags.yml
 class DefaultPredicate
   CONFIG_FILE = RAILS_ROOT + '/config/machine_tags.yml'
 
-  attr_accessor :rule, :global, :filter, :predicate
+  attr_accessor :rule, :global, :predicate
   def initialize(rule)
     @rule = rule
-    @global = !include?(Tag::PREDICATE_DELIMITER)
+    @global = !@rule.include?(Tag::PREDICATE_DELIMITER)
+    @predicate = @global ? @rule : Tag.split_machine_tag(@rule)[1]
+  end
+
+  def machine_tags
+    @machine_tags ||= Tag.machine_tags( @global ? Tag.build_machine_tag('*', @rule, '*') : @rule )
+  end
+
+  def values
+    machine_tags.map {|e| e.value }.uniq
+  end
+
+  def filter
+    @filter ||= begin
+      @global ? "*:*=(#{values.join('|')})" : "#{machine_tags[0].namespace}:*=(#{values.join('|')})"
+    end
   end
 
   class <<self
     # Used by Url to find default predicate
     def find(value, namespace)
       mtag_to_match = Tag.build_machine_tag(namespace, '*', value)
-      (match = default_predicates.find {|e| mtag_to_match[/#{e[0].gsub('*', '.*')}/]}) ? match[1] : 'tags'
+      (match = predicates.find {|e| mtag_to_match[/^#{e.filter.gsub('*', '.*')}$/] }) ?
+        match.predicate : 'tags'
     end
 
-    # :static_predicates: ?
-    # - "*:*=(ruby|perl|sh|python|js|flash|cpp|bash)"
-    # - plang
     def config
       @config ||= read_config
     end
@@ -41,9 +54,7 @@ class DefaultPredicate
     end
 
     def generate_global_predicates
-      config[:global_predicates].map {|e|
-          mtags = Tag.machine_tags(Tag.build_machine_tag('*', e, '*')); ["*:*=(#{mtags.map(&:value).uniq.join('|')})", e]
-      }
+      config[:global_predicates].map {|e| new(e) }
     end
 
     def dynamic_predicates
@@ -51,9 +62,7 @@ class DefaultPredicate
     end
 
     def generate_dynamic_predicates
-      config[:dynamic_predicates].map {|e|
-        mtags = Tag.machine_tags(e); ["#{mtags[0].namespace}:*=(#{mtags.map(&:value).uniq.join('|')})", mtags[0].predicate]
-      }
+      config[:dynamic_predicates].map {|e| new(e) }
     end
 
     def machine_tag_reload
@@ -63,9 +72,9 @@ class DefaultPredicate
     end
 
     # used to determine what default predicates are set depending on namespace and value
-    def default_predicates
-      (config[:static_predicates] || [] + dynamic_predicates + global_predicates).
-      map {|e| ["^"+e[0]+"$", e[1]] }
+    # :static_predicates: ["*:*=(ruby|perl|sh|python|js|flash|cpp|bash)"] ?
+    def predicates
+      global_predicates + dynamic_predicates
     end
   end
 end

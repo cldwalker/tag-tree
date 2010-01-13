@@ -91,3 +91,4 @@
   tag_list: tl
   console_update: cu
   regex_update_attribute: rua
+  default_predicates: dp

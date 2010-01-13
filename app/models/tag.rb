@@ -4,6 +4,7 @@ class Tag < ActiveRecord::Base
   #td: doesn't load properly
   # has_machine_tags :quick_mode=>true, :console=>true
   can_console_update :only=>%w{name description}
+
   class <<self
     def machine_tag_names
       (namespaces + predicates + values).uniq

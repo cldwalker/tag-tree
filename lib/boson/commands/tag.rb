@@ -23,8 +23,9 @@ module TagLib
     Tag.send(options[:type]).map {|e| [e.counter, e.count.to_i] }
   end
 
-  # @render_options :change_fields =>['predicate', 'regex']
+  # @render_options :fields=>{:values=>[:rule, :predicate, :filter, :values, :global], :default=>[:rule, :predicate, :filter] },
+  #  :filters=>{:default=>{:values=>:inspect}}
   def default_predicates
-    DefaultPredicate.default_predicates.map {|e| e.reverse }
+    DefaultPredicate.predicates
   end
 end
