@@ -16,6 +16,13 @@
       - namespace
       - predicate
       - value
+  DefaultPredicate:
+    :class: :auto_table
+    :options:
+      :fields:
+      - rule
+      - predicate
+      - filter
   NamespaceTree:
     :class: Hirb::Helpers::Tree
     :output_method: to_tree

@@ -1,11 +1,12 @@
 # Determines default predicates for machine tags by generating filters (regexs) from rules in config/machine_tags.yml
+# Note: This class doesn't consistently build machine tags with Tag.build_machine_tag()
 class DefaultPredicate
   CONFIG_FILE = RAILS_ROOT + '/config/machine_tags.yml'
 
   attr_accessor :rule, :global, :predicate
   def initialize(rule)
     @rule = rule
-    @global = !@rule.include?(Tag::PREDICATE_DELIMITER)
+    @global = !Tag.machine_tag?(@rule)
     @predicate = @global ? @rule : Tag.split_machine_tag(@rule)[1]
   end
 
@@ -65,7 +66,7 @@ class DefaultPredicate
       config[:dynamic_predicates].map {|e| new(e) }
     end
 
-    def machine_tag_reload
+    def reload
       @config = read_config
       @dynamic_predicates = generate_dynamic_predicates
       @global_predicates = generate_global_predicates

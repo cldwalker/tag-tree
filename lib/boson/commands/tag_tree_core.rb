@@ -6,8 +6,8 @@ module TagTreeCore
   # @config :global_options=>true
   # Open urls specified by id in browser
   def open_url(*args)
-    urls = Url.console_find(args).map(&:name)
-    browser *urls
+    urls = Url.console_find(*args).map(&:name)
+    browser *urls unless urls.empty?
     urls.join(' ')
   end
 
