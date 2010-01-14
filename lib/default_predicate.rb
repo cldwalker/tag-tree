@@ -75,7 +75,7 @@ class DefaultPredicate
     # used to determine what default predicates are set depending on namespace and value
     # :static_predicates: ["*:*=(ruby|perl|sh|python|js|flash|cpp|bash)"] ?
     def predicates
-      global_predicates + dynamic_predicates
+      dynamic_predicates + global_predicates
     end
   end
 end
