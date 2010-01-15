@@ -1,15 +1,18 @@
-:global_predicates:
-  - plang
-  - location
-  - site
-  - os
-  - lang
-  - app
-  - std
-:dynamic_predicates:
-  - site:type=*
-  - gem:type=*
-  - app:type=*
-  - plugin:type=*
-  - person:name=*
-  - lib:plugin=*
+--- 
+:global_predicates: 
+- plang
+- location
+- site
+- os
+- lang
+- app
+- std
+- gem
+- lib
+- person
+- name
+:dynamic_predicates: 
+- site:type=*
+- gem:type=*
+- app:type=*
+- plugin:type=*
