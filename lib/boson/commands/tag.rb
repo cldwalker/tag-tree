@@ -1,7 +1,12 @@
 module TagLib
+  # @options :gsub=>:boolean
   # Renames tag
-  def rename_tag(old_name, new_name)
-    Tag.find_by_name(old_name).update_attribute :name, new_name
+  def rename_tag(old_name, new_name, options={})
+    if options[:gsub]
+      Tag.console_find(old_name).each {|e| e.update_attribute :name, e.name.gsub(old_name, new_name) }
+    else
+      Tag.find_by_name(old_name).update_attribute :name, new_name
+    end
   end
 
   # @options :columns=>{:values=>Tag.column_names, :default=>['name']},
@@ -32,11 +37,31 @@ module TagLib
     DefaultPredicate.reload
   end
 
+  def predicate_values(pred)
+    dpred = DefaultPredicate.global_predicates.find {|e| e.predicate == pred }
+    return puts("Global predicate '#{pred}' doesn't exist") unless dpred
+    dpred.values
+  end
+
   # @render_options :change_fields=>['tag', 'count']
-  # Lists values of global predicates that conflict. Depends on external core/array library
-  def check_global_predicates
+  # Lists values of global predicates that conflict across predicates. Depends on external core/array library
+  def check_unique_values
     vals = DefaultPredicate.global_predicates.map {|e| e.values}.flatten
     count_hash(vals).select {|k,v| v > 1 }
+  end
+
+  # @render_options :fields=>[:value, :expected, :actual], :filters=>{:default=>{:actual=>:inspect}}
+  # List values of global predicates that aren't faithful to just one predicate
+  def check_faithful_values
+    DefaultPredicate.global_predicates.inject([]) do |acc, pred|
+      pred.values.each do |value|
+        unique_pred_values = Tag.find(:all, :conditions=>{:value=>value}, :select=>'distinct predicate, value')
+        if unique_pred_values.size > 1
+          acc << {:value=>value, :expected=>pred.predicate, :actual=>unique_pred_values.map {|e| e.predicate }}
+        end
+      end
+      acc
+    end
   end
 
   # Prints out a list of unused tags to destroy

@@ -6,6 +6,7 @@
 - tag_tree_core
 - url_finder_commands
 - tag
+- tag_analysis
 :libraries:
   url_finder_commands:
     :dependencies:
