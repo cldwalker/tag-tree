@@ -1,11 +1,11 @@
 module TagLib
-  # @options :gsub=>:boolean
+  # @options :exact=>:boolean
   # Renames tag
   def rename_tag(old_name, new_name, options={})
-    if options[:gsub]
-      Tag.console_find(old_name).each {|e| e.update_attribute :name, e.name.gsub(old_name, new_name) }
-    else
+    if options[:exact]
       Tag.find_by_name(old_name).update_attribute :name, new_name
+    else
+      Tag.console_find(old_name).each {|e| e.update_attribute :name, e.name.gsub(old_name, new_name) }
     end
   end
 
@@ -38,17 +38,22 @@ module TagLib
   end
 
   # @config :alias=>'pvs'
-  # Lists values of given predicates. If no predicates given, lists all predicate values
+  # @desc Lists values of given predicates. If predicate doesn't exist then it's looked up.
+  # If no predicates given, lists all predicate values
   def predicate_values(*preds)
     if !preds.empty?
       preds.map {|pred|
         dpred = DefaultPredicate.global_predicates.find {|e| e.predicate == pred }
-        puts("Global predicate '#{pred}' doesn't exist") unless dpred
-        dpred ? dpred.values : []
+        dpred ? dpred.values : unique_predicate_value_tags(pred).map {|e| e.value }.flatten
       }.flatten
     else
       DefaultPredicate.global_predicates.map {|e| e.values}.flatten
     end
+  end
+
+  # Lists tags with unique values per predicate
+  def unique_predicate_value_tags(pred)
+    Tag.find(:all, :conditions=>{:predicate=>pred}, :select=>'distinct value, predicate')
   end
 
   # @render_options :change_fields=>['tag', 'count']

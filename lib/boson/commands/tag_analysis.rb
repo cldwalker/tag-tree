@@ -12,7 +12,7 @@ module TagAnalysis
   # Lists unique value counts per predicate
   def predicate_value_counts
     Tag.predicates.map {|e|
-      [e, Tag.find(:all, :conditions=>{:predicate=>e}, :select=>'distinct value, predicate').size]
+      [e, unique_predicate_value_tags(e).size]
     }
   end
 
