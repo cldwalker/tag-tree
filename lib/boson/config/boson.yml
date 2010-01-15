@@ -19,18 +19,9 @@
       - namespaces
       - values
       - predicates
-      - search_machine_tag_names
-      DefaultPredicate:
-      - machine_tag_reload
-    :commands:
-      search_machine_tag_names:
-        :description: Find tag names within machine tag fields with regex string
-      machine_tag_reload:
-        :description: Reload machine tag config
     :command_aliases:
       tag_find: tf
       search_machine_tag_names: mtrn
-      machine_tag_reload: mtr
       machine_tags: mt
       namespaces: nsps
       predicates: ps
