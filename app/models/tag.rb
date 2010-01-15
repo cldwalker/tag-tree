@@ -1,5 +1,4 @@
 class Tag < ActiveRecord::Base
-  has_tag_helper :default_tagged_class=>"Url"
   include HasMachineTags::TagConsole
   #td: doesn't load properly
   # has_machine_tags :quick_mode=>true, :console=>true
