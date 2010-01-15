@@ -37,10 +37,18 @@ module TagLib
     DefaultPredicate.reload
   end
 
-  def predicate_values(pred)
-    dpred = DefaultPredicate.global_predicates.find {|e| e.predicate == pred }
-    return puts("Global predicate '#{pred}' doesn't exist") unless dpred
-    dpred.values
+  # @config :alias=>'pvs'
+  # Lists values of given predicates. If no predicates given, lists all predicate values
+  def predicate_values(*preds)
+    if !preds.empty?
+      preds.map {|pred|
+        dpred = DefaultPredicate.global_predicates.find {|e| e.predicate == pred }
+        puts("Global predicate '#{pred}' doesn't exist") unless dpred
+        dpred ? dpred.values : []
+      }.flatten
+    else
+      DefaultPredicate.global_predicates.map {|e| e.values}.flatten
+    end
   end
 
   # @render_options :change_fields=>['tag', 'count']

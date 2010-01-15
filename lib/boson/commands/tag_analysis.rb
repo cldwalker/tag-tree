@@ -8,6 +8,14 @@ module TagAnalysis
     Tag.send(options[:type]).map {|e| [e.counter, e.count.to_i] }
   end
 
+  # @render_options :change_fields=>%w{predicate count}, :sort=>'count', :reverse_sort=>true
+  # Lists unique value counts per predicate
+  def predicate_value_counts
+    Tag.predicates.map {|e|
+      [e, Tag.find(:all, :conditions=>{:predicate=>e}, :select=>'distinct value, predicate').size]
+    }
+  end
+
   # @render_options :change_fields=>['predicate', 'count']
   # List global predicate counts
   def predicate_stats
