@@ -9,9 +9,11 @@ module TagAnalysis
   end
 
   # @render_options :change_fields=>%w{predicate count}, :sort=>'count', :reverse_sort=>true
+  # @options :new=>:boolean
   # Lists unique value counts per predicate
-  def predicate_value_counts
-    Tag.predicates.map {|e|
+  def predicate_value_counts(options={})
+    preds = options[:new] ? Tag.predicates - DefaultPredicate.global_predicates.map {|e| e.predicate } : Tag.predicates
+    preds.map {|e|
       [e, unique_predicate_value_tags(e).size]
     }
   end
