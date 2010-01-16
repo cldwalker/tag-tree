@@ -43,10 +43,12 @@
           :or:
             :type: :boolean
             :desc: Join queries by OR
-        :render_options: Url
+        :render_options:
+          :output_class: Url
         :description: Find urls by multiple wildcard machine tags. Defaults to AND-ing queries.
       console_find:
-        :render_options: Url
+        :render_options:
+          :output_class: Url
         :options:
           :limit: :numeric
           :offset: :numeric

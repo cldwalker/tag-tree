@@ -9,9 +9,9 @@ module TagLib
     end
   end
 
+  # @render_options :output_class=>"Tag"
   # @options :columns=>{:values=>Tag.column_names, :default=>['name']},
   #  :console_update=>:boolean, :limit=>:numeric, :offset=>:numeric
-  # @config :render_options=>"Tag"
   # Multiple regexp queries ORed together
   def tag_find(val, options={})
     results = Tag.console_find(val, options)
@@ -24,8 +24,8 @@ module TagLib
     Tag.machine_tag_names.grep(/#{name}/)
   end
 
-  # @render_options :fields=>{:values=>[:rule, :predicate, :filter, :values, :global],
-  #  :default=>[:rule, :predicate, :filter] }, :filters=>{:default=>{:values=>:inspect}}
+  # @render_options :output_class=>'DefaultPredicate', :fields=>{:values=>[:rule, :predicate, :filter, :values, :global]},
+  #  :filters=>{:default=>{:values=>:inspect}}
   # List default predicates
   def default_predicates
     DefaultPredicate.predicates
