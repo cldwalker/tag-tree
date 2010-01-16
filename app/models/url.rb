@@ -32,8 +32,7 @@ class Url < ActiveRecord::Base
       tagged_with(*args).count
     end
     
-    def super_tagged_with(*tags)
-      options = tags[-1].is_a?(Hash) ? tags.pop : {}
+    def super_tagged_with(tags, options={})
       results = tags.map {|e| Url.tagged_with(e, options.slice(:conditions)) }
       return results.flatten if results.size <= 1
       options[:or] ? results.flatten.uniq : results.inject {|t,v| t & v }

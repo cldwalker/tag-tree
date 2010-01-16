@@ -24,6 +24,20 @@ module TagTreeCore
     end
   end
 
+  # @options :or=>{:type=>:boolean, :desc=>'Join queries by OR'},
+  #   [:conditions,:c]=>{:type=>:string, :desc=>'Sql condition'}
+  # @render_options :output_class=>'Url'
+  # Find urls by multiple wildcard machine tags. Defaults to AND-ing queries.
+  def url_tagged_with(*mtags)
+    options = mtags[-1].is_a?(Hash) ? mtags.pop : {}
+    mtags.map! {|e| machine_tag_query?(e) ? e : "#{Tag::VALUE_DELIMITER}#{e}" }
+    Url.super_tagged_with(mtags, options)
+  end
+
+  def machine_tag_query?(word)
+    word[/#{Tag::PREDICATE_DELIMITER}|#{Tag::VALUE_DELIMITER}|\./]
+  end
+
   # @options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
   # Displays query tree given wildcard machine tag
   def query_tree(mtag, options={})

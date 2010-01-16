@@ -33,19 +33,6 @@
     :commands:
       quick_create:
         :description: Quickly create a url
-      super_tagged_with:
-        :args: *
-        :options:
-          :conditions:
-            :desc: Sql condition
-            :alias:
-            - c
-          :or:
-            :type: :boolean
-            :desc: Join queries by OR
-        :render_options:
-          :output_class: Url
-        :description: Find urls by multiple wildcard machine tags. Defaults to AND-ing queries.
       console_find:
         :render_options:
           :output_class: Url
@@ -66,7 +53,6 @@
     :class_commands:
       Url:
       - quick_create
-      - super_tagged_with
       - console_find
       - console_update
     :command_aliases:
@@ -75,7 +61,7 @@
       tag_tree: tt
       query_tree: qt
       quick_create: uc
-      super_tagged_with: ut
+      url_tagged_with: ut
       console_find: uf
 :command_aliases:
   tag_add_and_remove: tar
