@@ -7,7 +7,17 @@
 - url_finder_commands
 - tag
 - tag_analysis
+- machine_tag_filters
 :libraries:
+  machine_tag_filters:
+    :class_commands:
+      mtag_reset: MachineTagFilters.reset
+      mtag_filter: MachineTagFilters.filter
+    :commands:
+      mtag_reset:
+        :description: Resets cached machine tag field values
+      mtag_filter:
+        :description: Filters machine tag input
   url_finder_commands:
     :dependencies:
     - active_record_ext
