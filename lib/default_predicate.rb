@@ -15,7 +15,7 @@ class DefaultPredicate
   end
 
   def values
-    machine_tags.map {|e| e.value }.uniq
+    machine_tags.map {|e| e.value }.uniq - (DefaultPredicate.config[:predicate_exceptions][rule] || [])
   end
 
   def filter
@@ -37,7 +37,8 @@ class DefaultPredicate
     end
 
     def read_config
-      File.exists?(CONFIG_FILE) ? YAML::load_file(CONFIG_FILE) : {:global_predicates=>[], :dynamic_predicates=>[]}
+      File.exists?(CONFIG_FILE) ? YAML::load_file(CONFIG_FILE) :
+        { :global_predicates=>[], :dynamic_predicates=>[], :predicate_exceptions=>{} }
     end
 
     def add_rules(*rules)

@@ -1,4 +1,7 @@
 --- 
+:predicate_exceptions: 
+  rlib: 
+  - shell
 :global_predicates: 
 - plang
 - location
@@ -11,6 +14,12 @@
 - lib
 - person
 - name
+- genre
+- tstd
+- org
+- method
+- class
+- rlib
 :dynamic_predicates: 
 - site:type=*
 - gem:type=*
