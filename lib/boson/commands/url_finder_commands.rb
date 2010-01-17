@@ -1,5 +1,4 @@
 module UrlFinderCommands
-  # console_update depends on cldwalker-console_update gem
   url_methods = %w{tag_add_and_remove tag_remove_and_save tag_add_and_save tag_list} +
     %w{regex_update_attribute tag_and_save}
   generated_methods = url_methods.map do |m|

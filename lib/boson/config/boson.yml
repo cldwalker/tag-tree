@@ -64,7 +64,6 @@
       Url:
       - quick_create
       - console_find
-      - console_update
     :command_aliases:
       open_url: ou
       namespace_tree: nt
@@ -73,12 +72,12 @@
       quick_create: uc
       url_tagged_with: ut
       console_find: uf
+      console_update: cu
 :command_aliases:
   tag_add_and_remove: tar
   tag_remove_and_save: tr
   tag_add_and_save: ta
   tag_and_save: ts
   tag_list: tl
-  console_update: cu
   regex_update_attribute: rua
   default_predicates: dp

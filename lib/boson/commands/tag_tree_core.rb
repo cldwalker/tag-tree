@@ -11,6 +11,14 @@ module TagTreeCore
     urls.join(' ')
   end
 
+  # Updates records, looking them up if needed
+  def console_update(*args)
+    unless args[0].is_a?(ActiveRecord::Base)
+      args = args[0].is_a?(Integer) ? Url.console_find(*args) : Url.super_tagged_with(args)
+    end
+    Url.console_update(args)
+  end
+
   # @render_options :fields=>[:id, :old_tags, :new_tags]
   # @options [:save, :S]=>:boolean
   # Renames tags of given urls with gsub
