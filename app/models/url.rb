@@ -7,8 +7,7 @@ class Url < ActiveRecord::Base
 
   # override has_machine_tags's method to provide a default predicate
   def current_tag_list(list)
-    HasMachineTags::TagList.new(list, :quick_mode=>self.quick_mode, :default_predicate=>
-      proc {|*args| DefaultPredicate.find(*args) })
+    self.class.tag_list(list)
   end
 
   def update_timestamp
@@ -16,6 +15,11 @@ class Url < ActiveRecord::Base
   end
 
   class<<self
+    def tag_list(list)
+      HasMachineTags::TagList.new(list, :quick_mode=>self.quick_mode, :default_predicate=>
+        proc {|*args| DefaultPredicate.find(*args) })
+    end
+
     def quick_create(string)
       name, description, tags = string.split(",,")
       create_hash = {:name=>name}

@@ -26,7 +26,7 @@ module TagTreeCore
       if options[:save]
         e.tag_and_save(new_tag_list)
       end
-      {:id=>e.id, :old_tags=>e.tag_list, :new_tags=>new_tag_list.join(', ')}
+      {:id=>e.id, :old_tags=>e.quick_mode_tag_list, :new_tags=>Url.tag_list(new_tag_list).to_quick_mode_string }
     end
   end
 
