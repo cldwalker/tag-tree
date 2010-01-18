@@ -42,8 +42,6 @@
     :dependencies:
     - active_record_ext
     :commands:
-      quick_create:
-        :description: Quickly create a url
       console_find:
         :render_options:
           :output_class: Url
@@ -63,7 +61,6 @@
         :description: Find urls by ids, range of ids or regex search of fields
     :class_commands:
       Url:
-      - quick_create
       - console_find
       - tagged_with_count
     :command_aliases:
@@ -72,7 +69,7 @@
       namespace_tree: nt
       tag_tree: tt
       query_tree: qt
-      quick_create: uc
+      url_create: uc
       url_tagged_with: ut
       console_find: uf
       console_update: cu

@@ -20,18 +20,6 @@ class Url < ActiveRecord::Base
         proc {|*args| DefaultPredicate.find(*args) })
     end
 
-    def quick_create(string)
-      name, description, tags = string.split(",,")
-      create_hash = {:name=>name}
-      if tags.nil?
-        create_hash[:tag_list] = description
-      else
-        create_hash[:description] = description
-        create_hash[:tag_list] = tags
-      end
-      create(create_hash)
-    end
-    
     def tagged_with_count(*args)
       tagged_with(*args).count
     end

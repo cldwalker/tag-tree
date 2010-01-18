@@ -30,6 +30,23 @@ module TagTreeCore
     end
   end
 
+  # @options :pretend=>:boolean
+  # Create a url quickly by delimiting fields with ',,'
+  def url_create(string, options={})
+    name, description, tags = string.split(",,")
+    create_hash = {:name=>name}
+    if tags.nil?
+      create_hash[:tag_list] = description
+    else
+      create_hash[:description] = description
+      create_hash[:tag_list] = tags
+    end
+    # create_hash[:tag_list] = Url.tag_list(create_hash[:tag_list]).to_a.map {|e| mtag_filter e }.join(',')
+    #td: mtag_filter should also replace tags= w/ global predicate=
+
+    options[:pretend] ? create_hash : Url.create(create_hash)
+  end
+
   # @options :or=>{:type=>:boolean, :desc=>'Join queries by OR'}, :limit=>:numeric,
   #   [:conditions,:c]=>{:type=>:string, :desc=>'Sql condition'}, [:offset, :O]=>:numeric
   # @render_options :output_class=>'Url'
