@@ -31,6 +31,7 @@
       - values
       - predicates
     :command_aliases:
+      rename_tags: rt
       tag_find: tf
       search_machine_tag_names: mtrn
       machine_tags: mt
@@ -64,7 +65,9 @@
       Url:
       - quick_create
       - console_find
+      - tagged_with_count
     :command_aliases:
+      tagged_with_count: utc
       open_url: ou
       namespace_tree: nt
       tag_tree: tt

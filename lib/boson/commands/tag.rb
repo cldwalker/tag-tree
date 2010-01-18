@@ -1,11 +1,12 @@
 module TagLib
   # @options :exact=>:boolean
-  # Renames tag
-  def rename_tag(old_name, new_name, options={})
+  # Renames tag(s)
+  def rename_tags(old_name, new_name, options={})
     if options[:exact]
       Tag.find_by_name(old_name).update_attribute :name, new_name
     else
-      Tag.console_find(old_name).each {|e| e.update_attribute :name, e.name.gsub(old_name, new_name) }
+      old_name, new_name = mtag_filter(old_name), mtag_filter(new_name)
+      Tag.console_find(old_name +'$').each {|e| e.update_attribute :name, e.name.gsub(/#{old_name}$/, new_name) }
     end
   end
 
