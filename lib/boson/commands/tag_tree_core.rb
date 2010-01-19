@@ -51,7 +51,7 @@ module TagTreeCore
   # @options :or=>{:type=>:boolean, :desc=>'Join queries by OR'}, :limit=>:numeric,
   #   [:conditions,:c]=>{:type=>:string, :desc=>'Sql condition'}, [:offset, :O]=>:numeric
   # @render_options :output_class=>'Url'
-  # @config :menu=>{:command=>'browser', :template_args=>':name'}
+  # @config :menu=>{:command=>'browser', :args=>':name'}
   # Find urls by multiple wildcard machine tags. Defaults to AND-ing queries.
   def url_tagged_with(*mtags)
     options = mtags[-1].is_a?(Hash) ? mtags.pop : {}
