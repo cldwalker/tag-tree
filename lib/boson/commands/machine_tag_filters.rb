@@ -2,6 +2,15 @@ module ::Boson::OptionCommand::Filters
   def mtag_argument(val)
     ::MachineTagFilters.filter(val)
   end
+
+  def ourls_argument(args)
+    args.flatten!
+    unless args[0].is_a?(ActiveRecord::Base)
+      args = Boson.invoke(:machine_tag_query?, args[0].to_s) ? Url.super_tagged_with(args) :
+        (args.empty? ? [] : Url.console_find(*args))
+    end
+    args
+  end
 end
 
 module ::MachineTagFilters

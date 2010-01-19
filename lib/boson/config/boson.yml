@@ -43,6 +43,10 @@
     - active_record_ext
     :commands:
       console_find:
+        :config:
+          :menu:
+            :command: browser
+            :template_args: ':name'
         :render_options:
           :output_class: Url
         :options:

@@ -5,23 +5,24 @@ module TagTreeCore
 
   # @config :global_options=>true
   # Open urls specified by id in browser
-  def open_url(*args)
-    urls = Url.console_find(*args).map(&:name)
+  def open_url(*ourls)
+    urls = ourls.map(&:name)
     browser *urls unless urls.empty?
     urls.join(' ')
   end
 
+  # @config :global_options=>true
   # Updates records, looking them up if needed
-  def console_update(*urls)
-    urls = url_filter(urls.flatten)
-    urls.empty? ? [] : Url.console_update(urls)
+  def console_update(*ourls)
+    ourls.empty? ? [] : Url.console_update(ourls)
   end
 
+  # @config :alias=>'gt'
   # @render_options :fields=>[:id, :old_tags, :new_tags]
   # @options [:save, :S]=>:boolean
   # Renames tags of given urls with gsub
-  def gsub_tags(urls, regex, substitution, options={})
-    url_filter(urls).map do |e|
+  def gsub_tags(ourls, regex, substitution, options={})
+    ourls.map do |e|
       new_tag_list = e.tag_list.map {|f| f.gsub(regex, substitution)}
       if options[:save]
         e.tag_and_save(new_tag_list)
@@ -50,18 +51,12 @@ module TagTreeCore
   # @options :or=>{:type=>:boolean, :desc=>'Join queries by OR'}, :limit=>:numeric,
   #   [:conditions,:c]=>{:type=>:string, :desc=>'Sql condition'}, [:offset, :O]=>:numeric
   # @render_options :output_class=>'Url'
+  # @config :menu=>{:command=>'browser', :template_args=>':name'}
   # Find urls by multiple wildcard machine tags. Defaults to AND-ing queries.
   def url_tagged_with(*mtags)
     options = mtags[-1].is_a?(Hash) ? mtags.pop : {}
     mtags.map! {|e| machine_tag_query?(e) ? e : "#{Tag::VALUE_DELIMITER}#{e}" }
     Url.super_tagged_with(mtags, options)
-  end
-
-  def url_filter(args)
-    unless args[0].is_a?(ActiveRecord::Base)
-      args = machine_tag_query?(args[0].to_s) ? Url.super_tagged_with(args) : Url.console_find(*args)
-    end
-    args
   end
 
   def machine_tag_query?(word)

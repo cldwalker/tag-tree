@@ -27,14 +27,14 @@ module TagTreeMigration
   # @options :save=>:boolean
   # @desc Detects if urls have a machine tag and if they do, applies the common namespace to
   # remaining normal tags
-  def convert_to_machine_tags(urls, options={})
-    namespace = urls.select {|e| 
+  def convert_to_machine_tags(ourls, options={})
+    namespace = ourls.select {|e|
       nsp = e.tag_list.select {|f| break $1 if f =~ /^(\S+):/}
        break nsp if !nsp.empty?
       false
     }
     if namespace
-      urls.map {|e|
+      ourls.map {|e|
         new_tag_list = e.tag_list.map {|f|
           f.include?("#{namespace}:") ? f : "#{namespace}:#{f}"
         }
