@@ -2,6 +2,11 @@
 :predicate_exceptions: 
   rlib: 
   - shell
+:dynamic_predicates: 
+- site:type=*
+- gem:type=*
+- app:type=*
+- plugin:type=*
 :global_predicates: 
 - plang
 - location
@@ -20,8 +25,7 @@
 - method
 - class
 - rlib
-:dynamic_predicates: 
-- site:type=*
-- gem:type=*
-- app:type=*
-- plugin:type=*
+- webapp
+- plugin
+- subject
+- mind
