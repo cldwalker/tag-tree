@@ -6,7 +6,7 @@ module UrlFinderCommands
 
   def self.config
     { :commands=>url_methods.inject({}) {|t,e|
-        t[e] = {:args=>'*', :global_options=>true}; t
+        t[e] = {:args=>'*', :option_command=>true}; t
       }
     }
   end

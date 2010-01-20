@@ -3,7 +3,7 @@ module TagTreeCore
     require 'namespace_tree'
   end
 
-  # @config :global_options=>true
+  # @config :option_command=>true
   # Open urls specified by id in browser
   def open_url(*ourls)
     urls = ourls.map(&:name)
@@ -11,7 +11,7 @@ module TagTreeCore
     urls.join(' ')
   end
 
-  # @config :global_options=>true
+  # @config :option_command=>true
   # Updates records, looking them up if needed
   def console_update(*ourls)
     ourls.empty? ? [] : Url.console_update(ourls)
