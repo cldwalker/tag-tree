@@ -1,6 +1,7 @@
 module TagTreeCore
   def self.included(mod)
     require 'namespace_tree'
+    require 'machine_tag'
   end
 
   # @config :option_command=>true
@@ -32,16 +33,11 @@ module TagTreeCore
   end
 
   # @options :pretend=>:boolean
-  # Create a url quickly by delimiting fields with ',,'
-  def url_create(string, options={})
-    name, description, tags = string.split(",,")
-    create_hash = {:name=>name}
-    if tags.nil?
-      create_hash[:tag_list] = description
-    else
-      create_hash[:description] = description
-      create_hash[:tag_list] = tags
-    end
+  # Create a url object quickly. An optional third argument adds a description.
+  def url_create(url, mtags, *args)
+    options = args[-1].is_a?(Hash) ? args.pop : {}
+    create_hash = {:name=>url, :tag_list=>mtags}
+    create_hash[:description] = args[0] if args[0]
     # create_hash[:tag_list] = Url.tag_list(create_hash[:tag_list]).to_a.map {|e| mtag_filter e }.join(',')
     #td: mtag_filter should also replace tags= w/ global predicate=
 
@@ -55,12 +51,8 @@ module TagTreeCore
   # Find urls by multiple wildcard machine tags. Defaults to AND-ing queries.
   def url_tagged_with(*mtags)
     options = mtags[-1].is_a?(Hash) ? mtags.pop : {}
-    mtags.map! {|e| machine_tag_query?(e) ? e : "#{Tag::VALUE_DELIMITER}#{e}" }
+    mtags.map! {|e| MachineTag.query?(e) ? e : "#{Tag::VALUE_DELIMITER}#{e}" }
     Url.super_tagged_with(mtags, options)
-  end
-
-  def machine_tag_query?(word)
-    word[/#{Tag::PREDICATE_DELIMITER}|#{Tag::VALUE_DELIMITER}|\./]
   end
 
   # @options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}

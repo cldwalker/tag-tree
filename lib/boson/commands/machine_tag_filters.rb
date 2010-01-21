@@ -1,3 +1,5 @@
+require 'machine_tag'
+
 module ::Boson::OptionCommand::Filters
   def mtag_argument(val)
     ::MachineTagFilters.filter(val)
@@ -6,7 +8,7 @@ module ::Boson::OptionCommand::Filters
   def ourls_argument(args)
     args.flatten!
     unless args[0].is_a?(ActiveRecord::Base)
-      args = Boson.invoke(:machine_tag_query?, args[0].to_s) ? Url.super_tagged_with(args) :
+      args = MachineTag.query?(args[0].to_s) ? Url.super_tagged_with(args) :
         (args.empty? ? [] : Url.console_find(*args))
     end
     args
@@ -31,25 +33,8 @@ module ::MachineTagFilters
       @predicates = @namespaces = @values = nil
     end
 
-    # could be more efficient if counting splitters i.e. word.split(/(:|=|\.)/)
-    # Alternative to Tag.match_wildcard_machine_tag
-    def parse_machine_tag(word)
-      values = word.split(/:|=|\./).delete_if {|e| e.blank? }
-      fields = word[/\./] ? [:namespace, :value] :
-        word[/:.*=/] ? [:namespace, :predicate, :value] :
-        word[/:(.*)/] ? ($1.empty? ? [:namespace] : [:namespace, :predicate]) :
-        word[/=$/] ? [:predicate] :
-        (word[/(.*)=/] && !$1.empty?) ? [:predicate, :value] : [:value]
-      if values.size == fields.size
-        fields.zip(values)
-      else
-        puts("fields (#{fields.inspect}) and values (#{values.inspect}) sizes are unequal")
-        []
-      end
-    end
-
     def filter(value)
-      mtags = Hash[*parse_machine_tag(value).flatten]
+      mtags = MachineTag[value]
       new_mtags = unalias_mtags(mtags.dup)
       new_mtags.each do |field, new_val|
         old_val = mtags[field]
