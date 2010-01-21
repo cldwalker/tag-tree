@@ -1,7 +1,6 @@
 module TagTreeCore
   def self.included(mod)
     require 'namespace_tree'
-    require 'machine_tag'
   end
 
   # @config :option_command=>true
@@ -34,13 +33,10 @@ module TagTreeCore
 
   # @options :pretend=>:boolean
   # Create a url object quickly. An optional third argument adds a description.
-  def url_create(url, mtags, *args)
+  def url_create(burl, quick_mtags, *args)
     options = args[-1].is_a?(Hash) ? args.pop : {}
-    create_hash = {:name=>url, :tag_list=>mtags}
+    create_hash = {:name=>burl, :tag_list=>quick_mtags}
     create_hash[:description] = args[0] if args[0]
-    # create_hash[:tag_list] = Url.tag_list(create_hash[:tag_list]).to_a.map {|e| mtag_filter e }.join(',')
-    #td: mtag_filter should also replace tags= w/ global predicate=
-
     options[:pretend] ? create_hash : Url.create(create_hash)
   end
 

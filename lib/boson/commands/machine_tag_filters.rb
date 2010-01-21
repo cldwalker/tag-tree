@@ -1,6 +1,17 @@
-require 'machine_tag'
-
 module ::Boson::OptionCommand::Filters
+  def quick_mtags_argument(val)
+    ::Url.tag_list(val).to_a.map {|mtag|
+      new_mtag = ::MachineTagFilters.filter mtag
+      if (mtag_hash = MachineTag[new_mtag])[:predicate] == 'tags'
+        if mtag_hash[:namespace] && mtag_hash[:value]
+          new_pred = DefaultPredicate.find(mtag_hash[:value], mtag_hash[:namespace])
+          new_mtag.sub!(mtag_hash[:predicate]+'=', new_pred+'=')
+        end
+      end
+      new_mtag
+    }.join(',')
+  end
+
   def mtag_argument(val)
     ::MachineTagFilters.filter(val)
   end
