@@ -5,7 +5,7 @@ module ::Boson::OptionCommand::Filters
       if (mtag_hash = MachineTag[new_mtag])[:predicate] == 'tags'
         if mtag_hash[:namespace] && mtag_hash[:value]
           new_pred = DefaultPredicate.find(mtag_hash[:value], mtag_hash[:namespace])
-          new_mtag.sub!(mtag_hash[:predicate]+Tag::VALUE_DELIMITER, new_pred+TAG::VALUE_DELIMITER)
+          new_mtag.sub!(mtag_hash[:predicate]+Tag::VALUE_DELIMITER, new_pred+Tag::VALUE_DELIMITER)
         end
       end
       new_mtag

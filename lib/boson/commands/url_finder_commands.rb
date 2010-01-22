@@ -9,8 +9,7 @@ module UrlFinderCommands
 
   def self.config
     { :commands=>(url_methods + implicit_tag_methods).inject({}) {|t,e|
-        # t[e] = {:args=>[['uid'], ['*implicit_tags']], :option_command=>true}; t
-        t[e] = {:args=>'*'}; t
+        t[e] = {:args=>[['uid'], ['*implicit_tags']], :option_command=>true}; t
       }
     }
   end
