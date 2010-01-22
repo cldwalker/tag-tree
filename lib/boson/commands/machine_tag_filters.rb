@@ -1,4 +1,17 @@
 module ::Boson::OptionCommand::Filters
+  def uid_and_quick_mtags_argument(val)
+    uid, *qmtags = val
+    ourl = ::Url.find(uid)
+    qmtags.map! {|e| quick_mtags_argument add_implicit_namespace(e, ourl) }
+    [ourl, qmtags]
+  end
+
+  # Adds primary namespace from a url if a machine tag has no namespace
+  def add_implicit_namespace(mtag, ourl)
+    mtag[/#{Tag::PREDICATE_DELIMITER}/] ? mtag : ourl.tag_list.primary_namespace.to_s + Tag::PREDICATE_DELIMITER + mtag
+  end
+
+
   def quick_mtags_argument(val)
     ::Url.tag_list(val).to_a.map {|mtag|
       new_mtag = ::MachineTagFilters.filter mtag
