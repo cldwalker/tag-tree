@@ -30,6 +30,11 @@
       - namespaces
       - values
       - predicates
+    :commands:
+      machine_tags:
+        :args:
+        - - mtag
+        :option_command: true
     :command_aliases:
       rename_tags: rt
       tag_find: tf

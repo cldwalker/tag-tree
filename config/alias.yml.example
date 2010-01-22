@@ -4,6 +4,7 @@ aliases:
     Url: U
     Tag: T
     DefaultPredicate: D
+    MachineTag: M
   instance_method:
     Url:
       tag_add_and_remove: tar
