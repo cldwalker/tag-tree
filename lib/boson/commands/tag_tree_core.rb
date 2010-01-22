@@ -33,9 +33,9 @@ module TagTreeCore
 
   # @options :pretend=>:boolean
   # Create a url object quickly. An optional third argument adds a description.
-  def url_create(burl, quick_mtags, *args)
+  def url_create(url, quick_mtags, *args)
     options = args[-1].is_a?(Hash) ? args.pop : {}
-    create_hash = {:name=>burl, :tag_list=>quick_mtags}
+    create_hash = {:name=>url, :tag_list=>quick_mtags}
     create_hash[:description] = args[0] if args[0]
     options[:pretend] ? create_hash : Url.create(create_hash)
   end
