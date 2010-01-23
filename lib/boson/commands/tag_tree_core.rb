@@ -31,13 +31,12 @@ module TagTreeCore
     end
   end
 
-  # @options :pretend=>:boolean
-  # Create a url object quickly. An optional third argument adds a description.
-  def url_create(url, quick_mtags, *args)
-    options = args[-1].is_a?(Hash) ? args.pop : {}
+  # @config :option_command=>true
+  # Create a url object quickly. Third arguments and on are used for optional description.
+  def url_create(url, quick_mtags, *desc)
     create_hash = {:name=>url, :tag_list=>quick_mtags}
-    create_hash[:description] = args[0] if args[0]
-    options[:pretend] ? create_hash : Url.create(create_hash)
+    create_hash[:description] = desc.join(' ') unless desc.empty?
+    Url.create(create_hash)
   end
 
   # @options :or=>{:type=>:boolean, :desc=>'Join queries by OR'}, :limit=>:numeric,
