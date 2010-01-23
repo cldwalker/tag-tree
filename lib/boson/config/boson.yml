@@ -15,9 +15,9 @@
       mtag_filter: MachineTagFilters.filter
     :commands:
       mtag_reset:
-        :description: Resets cached machine tag field values
+        :desc: Resets cached machine tag field values
       mtag_filter:
-        :description: Filters machine tag input
+        :desc: Filters machine tag input
   url_finder_commands:
     :dependencies:
     - active_record_ext
@@ -67,7 +67,7 @@
             - created_at
             - updated_at
         :args: *
-        :description: Find urls by ids, range of ids or regex search of fields
+        :desc: Find urls by ids, range of ids or regex search of fields
     :class_commands:
       Url:
       - console_find
