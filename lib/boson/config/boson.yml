@@ -11,8 +11,8 @@
 :libraries:
   machine_tag_filters:
     :class_commands:
-      mtag_reset: MachineTagFilters.reset
-      mtag_filter: MachineTagFilters.filter
+      mtag_reset: MachineTagQuery.reset
+      mtag_filter: MachineTagQuery.filter
     :commands:
       mtag_reset:
         :desc: Resets cached machine tag field values

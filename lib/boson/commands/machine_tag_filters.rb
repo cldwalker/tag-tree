@@ -14,7 +14,7 @@ module ::Boson::OptionCommand::Filters
 
   def quick_mtags_argument(val)
     ::Url.tag_list(val).to_a.map {|mtag|
-      new_mtag = ::MachineTagFilters.filter mtag
+      new_mtag = ::MachineTagQuery.filter mtag
       if (mtag_hash = MachineTag[new_mtag])[:predicate] == 'tags'
         if mtag_hash[:namespace] && mtag_hash[:value]
           new_pred = DefaultPredicate.find(mtag_hash[:value], mtag_hash[:namespace])
@@ -26,7 +26,7 @@ module ::Boson::OptionCommand::Filters
   end
 
   def mtag_argument(val)
-    ::MachineTagFilters.filter(val)
+    ::MachineTagQuery.filter(val)
   end
 
   def ourls_argument(args)
@@ -39,7 +39,8 @@ module ::Boson::OptionCommand::Filters
   end
 end
 
-module ::MachineTagFilters
+# Handles aliasing machine tag queries
+module ::MachineTagQuery
   class <<self
     def namespaces
       @namespaces ||= Tag.namespaces.sort
@@ -77,7 +78,7 @@ module ::MachineTagFilters
     def unalias_mtags(hash)
       possibles = {:value=>values, :namespace=>namespaces, :predicate=>predicates}
       hash.each do |field, val|
-        new_val = (possibles[field] || []).find {|e| e[/^#{val}/] }
+        new_val = ::Boson::Util.underscore_search(val, possibles[field] || [], true)
         hash[field] = new_val if new_val
       end
     end
