@@ -6,13 +6,5 @@ module TagTreeSetup
         IRB_PROCS[:reload_bond] = lambda {|e| ::Readline.completion_proc = ::Bond.agent }
       end
     end
-
-    old_config = ::Hirb.config
-    if ::Hirb::View.enabled?
-      ::Hirb.disable
-      ::Hirb.config_file = 'config/hirb.yml'
-      ::Hirb.config(true)
-    end
-    ::Hirb.enable old_config
   end
 end
