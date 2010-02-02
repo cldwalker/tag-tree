@@ -25,8 +25,7 @@ module TagLib
     Tag.machine_tag_names.grep(/#{name}/)
   end
 
-  # @render_options :output_class=>'DefaultPredicate', :fields=>{:values=>[:rule, :predicate, :filter, :values, :global]},
-  #  :filters=>{:default=>{:values=>:inspect}}
+  # @render_options :output_class=>'DefaultPredicate', :fields=>{:values=>[:rule, :predicate, :filter, :values, :global]}
   # List default predicates
   def default_predicates
     DefaultPredicate.predicates
@@ -64,7 +63,7 @@ module TagLib
     count_hash(vals).select {|k,v| v > 1 }
   end
 
-  # @render_options :fields=>[:value, :expected, :actual], :filters=>{:default=>{:actual=>:inspect}}
+  # @render_options :fields=>[:value, :expected, :actual]
   # List values of global predicates that aren't faithful to just one predicate
   def check_faithful_values
     DefaultPredicate.global_predicates.inject([]) do |acc, pred|
