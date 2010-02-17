@@ -1,32 +1,31 @@
 module UrlFinderCommands
-  def self.url_methods
-     %w{tag_list regex_update_attribute tag_and_save}
-  end
-
-  def self.implicit_tag_methods
-    %w{tag_add_and_remove tag_remove_and_save tag_add_and_save}
+  def self.update_methods
+    %w{tag_add_and_remove tag_remove_and_save tag_add_and_save tag_and_save regex_update_attribute}
   end
 
   def self.config
-    { :commands=>(url_methods + implicit_tag_methods).inject({}) {|t,e|
-        t[e] = {:args=>[['*uid_and_quick_mtags']], :option_command=>true}; t
+    {
+      :commands=>update_methods.inject({}) {|t,e|
+        t[e] = {:args=>[['*uid_and_quick_mtags']], :option_command=>true,
+          :config=>{:menu_action=>{:splat=>false}}
+        }
+        t[e][:args] = [['*args']] if e == 'regex_update_attribute'
+        t
       }
     }
   end
 
-  generated_methods = url_methods.map do |meth|
-    %[
-      def #{meth}(uid, *args)
-        ::Url.find(uid).#{meth}(*args)
-      end
-    ]
-  end.join("\n") +
-  implicit_tag_methods.map do |meth|
+  # @config :option_command=>true
+  def tag_list(*args)
+    ::Url.find(args.shift).tag_list
+  end
+
+  generated_methods = update_methods.map do |meth|
     %[
       def #{meth}(uid, *mtags)
-        ourl = uid.is_a?(::Url) ? uid : ::Url.find(uid)
-        # mtags.map! {|e| implicit_tag_filter(e, ourl) }
-        ourl.#{meth}(*mtags)
+        uid = Array(uid)
+        ourls = uid[0].is_a?(::Url) ? uid : ::Url.find(uid)
+        ourls.each {|e| e.#{meth}(*mtags) }
       end
     ]
   end.join("\n")

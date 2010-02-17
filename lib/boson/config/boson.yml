@@ -2,7 +2,7 @@
 - tag_tree_setup
 :console_defaults:
 - tag_tree_setup
-- core_ext
+# - core_ext
 - tag_tree_core
 - url_finder_commands
 - tag
@@ -51,7 +51,7 @@
         :config:
           :menu:
             :command: browser
-            :args: ':name'
+            :default_field: name
         :render_options:
           :output_class: Url
         :options:
