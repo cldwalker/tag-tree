@@ -1,7 +1,7 @@
 # These classes are used for querying machine tags and grouping results as outlines.
 # These methods are for console use and may change quickly.
 class NamespaceTree #:nodoc:
-  VIEWS = [:result, :group, :count, :description_result, :tag_result, :value_description, :table]
+  VIEWS = [:result, :group, :count, :description_result, :tag_result, :value_description, :table, :basic]
 
   def initialize(name, options={})
     @name = name.to_s
@@ -172,7 +172,7 @@ class QueryTree < TagTree #:nodoc:
   def namespace_groups
     unless @namespace_groups
       @namespace_groups = namespace_tags.map {|name, tags|
-        NamespaceTree.new(name, :tags=>tags, :tagged_items=>tagged_items)
+        NamespaceTree.new(name, @options.merge(:tags=>tags, :tagged_items=>tagged_items))
       }
     end
     @namespace_groups
