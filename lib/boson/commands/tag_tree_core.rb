@@ -57,7 +57,8 @@ module TagTreeCore
   end
 
   # @render_options :output_class=>NamespaceTree'
-  # @options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
+  # @options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS},
+  #  :fields=>[:id, :name, :description, :quick_mode_tag_list]
   # Displays different tag trees given a wildcard machine tag
   def tag_tree(mtag, options={})
     TagTree.new(mtag, options)

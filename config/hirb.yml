@@ -27,3 +27,5 @@
     :class: Hirb::Helpers::Tree
     :output_method: to_tree
     :ancestor: true
+    :options:
+      :multi_line_nodes: true

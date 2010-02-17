@@ -1,7 +1,7 @@
 # These classes are used for querying machine tags and grouping results as outlines.
 # These methods are for console use and may change quickly.
 class NamespaceTree #:nodoc:
-  VIEWS = [:result, :group, :count, :description_result, :tag_result, :value_description]
+  VIEWS = [:result, :group, :count, :description_result, :tag_result, :value_description, :table]
 
   def initialize(name, options={})
     @name = name.to_s
@@ -104,7 +104,15 @@ class NamespaceTree #:nodoc:
           value_string = e
           value_string += ": #{Tag.machine_tag(@name, pred, e).description}" if type == :value_description
           tree << [2, value_string]
-          tree += result_view(pred, e, type).map {|f| [3, f]}
+          if type == :table
+            urls = self.results_per_node(pred, e, type)
+            tree_indent = 4 # must match tree helper indent
+            table = Hirb::Helpers::AutoTable.render(urls, :fields=>@options[:fields],
+              :description=>false, :headers=>false, :max_width=>Hirb::View.width - 3 * tree_indent)
+            tree << [3, table]
+          else
+            tree += result_view(pred, e, type).map {|f| [3, f]}
+          end
       }
     end
     tree
@@ -149,7 +157,7 @@ class TagTree < NamespaceTree #:nodoc:
   def namespace_groups
     unless @namespace_groups
       @namespace_groups = namespace_tags.map {|name, tags|
-        NamespaceTree.new(name, :tags=>tags)
+        NamespaceTree.new(name, @options.merge(:tags=>tags))
       }
     end
     @namespace_groups
