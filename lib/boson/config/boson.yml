@@ -76,6 +76,7 @@
       tagged_with_count: utc
       open_url: ou
       machine_tag_tree: t
+      tagged_count: tc
       url_create: uc
       url_tagged_with: ut
       console_find: uf

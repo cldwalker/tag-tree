@@ -1,11 +1,25 @@
 class MachineTagTree
+  def self.tagged_count(query, options={})
+    obj = new(query, options)
+    obj.namespaces.inject([]) {|rows,nsp|
+      nsp.predicates.each {|pred|
+        row = {:namespace=>nsp.namespace, :predicate=>pred}
+        nsp.pred_count(pred).each do |val, count|
+          rows << row.merge(:value=>val, :count=>count)
+        end
+      }
+      rows
+    }
+  end
+
   def initialize(query, options={})
-    @query, @options = query, options
-    if @options[:set_tags_from_tagged]
-      @tagged = Url.tagged_with(@query, :include=>:tags)
+    if options[:set_tags_from_tagged]
+      @tagged = Url.tagged_with(query, :include=>:tags)
       @tags = @tagged.map(&:tags).flatten.uniq
+    elsif options[:regexp_tags]
+      @tags = Tag.find_by_regexp(query, ['name'])
     else
-      @tags = Tag.machine_tags(@query)
+      @tags = Tag.machine_tags(query)
     end
   end
 
