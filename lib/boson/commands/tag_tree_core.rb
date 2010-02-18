@@ -60,8 +60,9 @@ module TagTreeCore
   end
 
   # @render_options :fields=>[:namespace, :predicate, :value, :count], :sort=>{:default=>:count}, :reverse_sort=>true
+  # @options [:set_tags_from_tagged,:t]=>:boolean, :regexp_tags=>:boolean
   # List machine tags by their tagged counts
-  def tagged_count(mtag)
-    MachineTagTree.tagged_count(mtag)
+  def tagged_count(mtag, options={})
+    MachineTagTree.tagged_count(mtag, options)
   end
 end

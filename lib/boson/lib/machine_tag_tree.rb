@@ -1,15 +1,6 @@
 class MachineTagTree
   def self.tagged_count(query, options={})
-    obj = new(query, options)
-    obj.namespaces.inject([]) {|rows,nsp|
-      nsp.predicates.each {|pred|
-        row = {:namespace=>nsp.namespace, :predicate=>pred}
-        nsp.pred_count(pred).each do |val, count|
-          rows << row.merge(:value=>val, :count=>count)
-        end
-      }
-      rows
-    }
+    new(query, options).tagged_count
   end
 
   def initialize(query, options={})
@@ -35,6 +26,18 @@ class MachineTagTree
     }
   end
 
+  def tagged_count
+    namespaces.inject([]) {|rows,nsp|
+      nsp.predicates.each {|pred|
+        row = {:namespace=>nsp.namespace, :predicate=>pred}
+        nsp.pred_count(pred).each do |val, count|
+          rows << row.merge(:value=>val, :count=>count)
+        end
+      }
+      rows
+    }
+  end
+
   class Namespace
     attr_accessor :tagged, :namespace
     def initialize(namespace, tags, options={})
@@ -43,11 +46,11 @@ class MachineTagTree
     end
 
     def predicates
-      @tags.map(&:predicate)
+      @tags.map(&:predicate).uniq
     end
 
     def values
-      @tags.map(&:value)
+      @tags.map(&:value).uniq
     end
 
     def predicate_map
@@ -57,18 +60,24 @@ class MachineTagTree
     end
 
     def tagged_by_branch(pred, value, view)
-      current_machine_tag = Tag.build_machine_tag(@namespace, pred,value)
       if @tagged
-        @tagged.select {|e| e.tag_list.include?(current_machine_tag) }
+        tagged_with(pred, value)
       else
-        tagged_with_options = (view == :tag_result) ? {:include=>:tags} : {}
-        Url.tagged_with(current_machine_tag, tagged_with_options)
+        tagged_with_options = [:tag_result, :table].include?(view) ? {:include=>:tags} : {}
+        Url.tagged_with(machine_tag(pred, value), tagged_with_options)
       end
     end
 
-    # td: integrate with tagged_by_branch
-    def value_count(pred,value)
-      Url.tagged_with(Tag.build_machine_tag(@namespace, pred, value)).count
+    def tagged_with(pred, value)
+      @tagged.select {|e| e.tag_list.include?(machine_tag(pred, value)) }
+    end
+
+    def machine_tag(pred, value)
+      Tag.build_machine_tag(@namespace, pred,value)
+    end
+
+    def value_count(pred, value)
+      @tagged ? tagged_with(pred, value).size : Url.tagged_with(machine_tag(pred, value)).count
     end
 
     def pred_count(pred)
