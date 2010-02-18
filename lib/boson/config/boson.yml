@@ -75,9 +75,7 @@
     :command_aliases:
       tagged_with_count: utc
       open_url: ou
-      namespace_tree: nt
-      tag_tree: tt
-      query_tree: qt
+      machine_tag_tree: t
       url_create: uc
       url_tagged_with: ut
       console_find: uf

@@ -1,6 +1,7 @@
 module TagTreeCore
   def self.included(mod)
-    require 'namespace_tree'
+    require 'tag_tree'
+    require 'machine_tag_tree'
   end
 
   # @config :option_command=>true
@@ -50,23 +51,11 @@ module TagTreeCore
     Url.super_tagged_with(mtags, options)
   end
 
-  # @options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
-  # Displays query tree given wildcard machine tag
-  def query_tree(mtag, options={})
-    QueryTree.new(mtag, options)
-  end
-
-  # @render_options :output_class=>NamespaceTree'
-  # @options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS, :default=>:table},
-  #  :fields=>[:id, :name, :description, :quick_mode_tag_list]
-  # Displays different tag trees given a wildcard machine tag
-  def tag_tree(mtag, options={})
-    TagTree.new(mtag, options)
-  end
-
-  # @options :view=>{:type=>:string, :values=>NamespaceTree::VIEWS}
-  # Displays namespace tree given wildcard machine tag
-  def namespace_tree(mtag, options={})
-    NamespaceTree.new(mtag, options)
+  # @render_options :class=>TagTree, [:view, :w]=>{:type=>:string, :values=>TagTree::VIEWS, :default=>:table},
+  #  :fields=>TagTree::FIELDS, :multi_line_nodes=>true
+  # @options [:set_tags_from_tagged,:t]=>:boolean
+  # Display different tag trees given machine tag wildcard
+  def machine_tag_tree(mtag, options={})
+    MachineTagTree.new(mtag, options)
   end
 end
