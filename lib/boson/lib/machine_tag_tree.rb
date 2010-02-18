@@ -12,6 +12,11 @@ class MachineTagTree
     else
       @tags = Tag.machine_tags(query)
     end
+    [:namespace, :predicate, :value].each {|field|
+      if options[field]
+        @tags = @tags.select {|e| options[field].include?(e.send(field)) }
+      end
+    }
   end
 
   def namespace_tags
