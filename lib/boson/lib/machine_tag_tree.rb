@@ -14,7 +14,11 @@ class MachineTagTree
     end
     [:namespace, :predicate, :value].each {|field|
       if options[field]
-        @tags = @tags.select {|e| options[field].include?(e.send(field)) }
+        possible_matches = options[field].split(',')
+        @tags = @tags.select {|e|
+          field_value = e.send(field)
+          possible_matches.any? {|m| field_value =~ /^#{m}/ }
+        }
       end
     }
   end

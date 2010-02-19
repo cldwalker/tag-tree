@@ -54,9 +54,7 @@ module TagTreeCore
   # @render_options :class=>TagTree, [:view, :w]=>{:type=>:string, :values=>TagTree::VIEWS, :default=>:table},
   #  :fields=>TagTree::FIELDS, :multi_line_nodes=>true
   # @options [:set_tags_from_tagged,:t]=>:boolean, :regexp_tags=>:boolean,
-  #  :namespace=>{:type=>:array, :values=>'Tag.namespaces', :enum=>false},
-  #  :predicate=>{:type=>:array, :values=>'Tag.predicates', :enum=>false},
-  #  [:value,:V]=>{:type=>:array, :values=>'Tag.values', :enum=>false}
+  #  :namespace=>:string, :predicate=>:string, :value=>:string
   # Display different tag trees given machine tag wildcard
   def machine_tag_tree(mtag, options={})
     MachineTagTree.new(mtag, options)
@@ -64,9 +62,7 @@ module TagTreeCore
 
   # @render_options :fields=>[:namespace, :predicate, :value, :count], :sort=>{:default=>:count}, :reverse_sort=>true
   # @options [:set_tags_from_tagged,:t]=>:boolean, :regexp_tags=>:boolean,
-  #  :namespace=>{:type=>:array, :values=>'Tag.namespaces', :enum=>false},
-  #  :predicate=>{:type=>:array, :values=>'Tag.predicates', :enum=>false},
-  #  [:value,:V]=>{:type=>:array, :values=>'Tag.values', :enum=>false}
+  #  :namespace=>:string, :predicate=>:string, :value=>:string
   # List machine tags by their tagged counts
   def tagged_count(mtag, options={})
     MachineTagTree.tagged_count(mtag, options)
