@@ -25,6 +25,11 @@ module ::Boson::OptionCommand::Filters
     }.join(',')
   end
 
+  def mtree_argument(val)
+    return val if val.is_a?(Array)
+    mtag_argument(val)
+  end
+
   def mtag_argument(val)
     ::MachineTagQuery.filter(val)
   end

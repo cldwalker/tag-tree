@@ -11,6 +11,8 @@ class MachineTagTree
       @tags = @tagged.map(&:tags).flatten.uniq
     elsif options[:regexp_tags]
       @tags = Tag.find_by_regexp(query, ['name'])
+    elsif query.is_a?(Array)
+       @tags = Tag.find :all, :conditions=>{:name=>query}
     else
       @tags = Tag.machine_tags(query)
     end

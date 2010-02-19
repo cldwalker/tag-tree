@@ -55,16 +55,18 @@ module TagTreeCore
   #  :fields=>TagTree::FIELDS, :multi_line_nodes=>true
   # @options [:set_tags_from_tagged,:t]=>:boolean, :regexp_tags=>:boolean,
   #  :namespace=>:string, :predicate=>:string, :value=>:string, :context=>:string
+  # @config :menu_action=>{:multi_action=>false}
   # Display different tag trees given machine tag wildcard
-  def machine_tag_tree(mtag, options={})
-    MachineTagTree.new(mtag, options)
+  def machine_tag_tree(mtree, options={})
+    MachineTagTree.new(mtree, options)
   end
 
   # @render_options :fields=>[:namespace, :predicate, :value, :count], :sort=>{:default=>:count}, :reverse_sort=>true
   # @options [:set_tags_from_tagged,:t]=>:boolean, :regexp_tags=>:boolean,
   #  :namespace=>:string, :predicate=>:string, :value=>:string, :context=>:string
+  # @config :menu_action=>{:multi_action=>false}
   # List machine tags by their tagged counts
-  def tagged_count(mtag, options={})
-    MachineTagTree.tagged_count(mtag, options)
+  def tagged_count(mtree, options={})
+    MachineTagTree.tagged_count(mtree, options)
   end
 end
