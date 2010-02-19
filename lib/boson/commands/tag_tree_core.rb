@@ -52,7 +52,7 @@ module TagTreeCore
   end
 
   # @render_options :class=>TagTree, [:view, :w]=>{:type=>:string, :values=>TagTree::VIEWS, :default=>:table},
-  #  :fields=>TagTree::FIELDS, :multi_line_nodes=>true
+  #  :fields=>TagTree::FIELDS
   # @options [:set_tags_from_tagged,:t]=>:boolean, :regexp_tags=>:boolean,
   #  :namespace=>:string, :predicate=>:string, :value=>:string, :context=>:string
   # @config :menu_action=>{:multi_action=>false}

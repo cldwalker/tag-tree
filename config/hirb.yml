@@ -23,3 +23,11 @@
       - rule
       - predicate
       - filter
+  MachineTagTree:
+    :class: TagTree
+    :options:
+      :fields:
+      - id
+      - name
+      - description
+      - quick_mode_tag_list

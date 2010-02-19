@@ -1,13 +1,15 @@
+# Displays tagged urls under a machine tag tree with branches at these levels
 class TagTree < Hirb::Helpers::Tree
   VIEWS = [:result, :group, :count, :description_result, :tag_result, :value_description, :table, :basic]
   FIELDS = [:id, :name, :description, :quick_mode_tag_list]
 
   class <<self
   def render(mtree, options={})
-    @options = options
-    @view = options[:view] || :basic
+    @options = {:multi_line_nodes=>true}.merge options
+    @view = @options[:view] || :basic
     nodes = build_mtree_nodes(mtree)
-    super(nodes, options)
+    delete_empty_branches if options[:delete_empty_branches]
+    super(nodes, @options)
   end
 
   def build_mtree_nodes(mtree)

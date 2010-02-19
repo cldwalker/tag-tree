@@ -5,20 +5,30 @@ class MachineTagTree
 
   def initialize(query, options={})
     @options = options
-
-    if options[:set_tags_from_tagged]
-      @tagged = tagged_with(query, :include=>:tags)
-      @tags = @tagged.map(&:tags).flatten.uniq
-    elsif options[:regexp_tags]
-      @tags = Tag.find_by_regexp(query, ['name'])
-    elsif query.is_a?(Array)
-       @tags = Tag.find :all, :conditions=>{:name=>query}
-    else
-      @tags = Tag.machine_tags(query)
+    @tags = set_tags(query)
+    limit_tags_by_fields
+    if options[:delete_empty_tags] || (options[:context] && !options[:set_tags_from_tagged])
+      @tags.delete_if {|e| tagged_with(e.name, :include=>:tags).size.zero? }
     end
+  end
+
+  def set_tags(query)
+    if @options[:set_tags_from_tagged]
+      @tagged = tagged_with(query, :include=>:tags)
+      @tagged.map(&:tags).flatten.uniq
+    elsif @options[:regexp_tags]
+      Tag.find_by_regexp(query, ['name'])
+    elsif query.is_a?(Array)
+      Tag.find :all, :conditions=>{:name=>query}
+    else
+      Tag.machine_tags(query)
+    end
+  end
+
+  def limit_tags_by_fields
     [:namespace, :predicate, :value].each {|field|
-      if options[field]
-        possible_matches = options[field].split(',')
+      if @options[field]
+        possible_matches = @options[field].split(',')
         @tags = @tags.select {|e|
           field_value = e.send(field)
           possible_matches.any? {|m| field_value =~ /^#{m}/ }
@@ -60,8 +70,10 @@ class MachineTagTree
   end
 
   def tagged_with(mtag, options={})
-    results = Url.tagged_with(mtag, options)
-    @options[:context] ? filter_tagged(results, @options[:context]) : results
+    (@tagged_by_mtag ||= {})[mtag] ||= begin
+      results = Url.tagged_with(mtag, options)
+      @options[:context] ? filter_tagged(results, @options[:context]) : results
+    end
   end
 
   def filter_tagged(tagged, filter)
