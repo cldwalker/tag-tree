@@ -1,7 +1,4 @@
 --- 
-:predicate_exceptions: 
-  rlib: 
-  - shell
 :dynamic_predicates: 
 - site:type=*
 - gem:type=*
@@ -25,7 +22,12 @@
 - method
 - class
 - rlib
-- webapp
 - plugin
 - subject
 - mind
+- cs
+- ns
+- todo
+:predicate_exceptions: 
+  rlib: 
+  - shell

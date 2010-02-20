@@ -1,7 +1,7 @@
 module TagTreeCore
   def self.included(mod)
-    require 'tag_tree'
-    require 'machine_tag_tree'
+    # require 'tag_tree'
+    # require 'machine_tag_tree'
   end
 
   # @config :option_command=>true
