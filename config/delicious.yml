@@ -1,6 +1,6 @@
 --- 
-:updated_at: 2010-01-06 00:21:54.176061 Z
+:namespace: d
 :dependencies: 
 - active_record_ext
+:updated_at: 2010-06-27 00:55:29.110677 Z
 :object_methods: false
-:namespace: d

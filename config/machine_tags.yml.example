@@ -27,7 +27,6 @@
 - mind
 - cs
 - ns
-- todo
 :predicate_exceptions: 
   rlib: 
   - shell
