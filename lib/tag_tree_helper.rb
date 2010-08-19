@@ -1,5 +1,5 @@
 # Displays tagged urls under a machine tag tree with branches at these levels
-class TagTree < Hirb::Helpers::Tree
+class TagTreeHelper < Hirb::Helpers::Tree
   VIEWS = [:result, :group, :count, :description_result, :tag_result, :value_description, :table, :basic]
   FIELDS = [:id, :name, :description, :quick_mode_tag_list]
 

@@ -129,11 +129,11 @@ module Delicious
     end
 
     def write_config(hash)
-      File.open(::RAILS_ROOT + '/config/delicious.yml', 'w') {|f| f.write(hash.to_yaml) }
+      File.open(Rails.root + 'config/delicious.yml', 'w') {|f| f.write(hash.to_yaml) }
     end
 
     def store
-      @config ||= YAML::load_file(::RAILS_ROOT + '/config/delicious.yml') rescue {}
+      @config ||= YAML::load_file(Rails.root + 'config/delicious.yml') rescue {}
     end
 
     def client

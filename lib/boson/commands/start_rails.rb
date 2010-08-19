@@ -4,8 +4,7 @@ module StartRails
   end
 
   def self.after_included
-    ENV['RAILS_ENV'] ||= 'local'
-    require File.dirname(__FILE__) + '/../../../config/boot'
-    require ::RAILS_ROOT + '/config/environment'
+    Rails.env = 'local' if ENV['RAILS_ENV'] == 'local'
+    require File.dirname(__FILE__) + '/../../../config/environment'
   end
 end

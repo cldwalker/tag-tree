@@ -1,7 +1,9 @@
 module TagTreeCore
-  def self.included(mod)
-    # require 'tag_tree'
-    # require 'machine_tag_tree'
+  def self.after_included
+    require 'tag_tree_helper'
+    require 'machine_tag'
+    require 'default_predicate'
+    require 'machine_tag_tree'
   end
 
   # @config :option_command=>true
@@ -51,8 +53,8 @@ module TagTreeCore
     Url.super_tagged_with(mtags, options)
   end
 
-  # @render_options :class=>TagTree, [:view, :w]=>{:type=>:string, :values=>TagTree::VIEWS, :default=>:table},
-  #  :fields=>TagTree::FIELDS
+  # @render_options :class=>TagTreeHelper, [:view, :w]=>{:type=>:string, :values=>TagTreeHelper::VIEWS, :default=>:table},
+  #  :fields=>TagTreeHelper::FIELDS
   # @options [:set_tags_from_tagged,:t]=>:boolean, :regexp_tags=>:boolean,
   #  :namespace=>:string, :predicate=>:string, :value=>:string, :context=>:string
   # @config :menu_action=>{:multi_action=>false}

@@ -24,7 +24,7 @@
       - predicate
       - filter
   MachineTagTree:
-    :class: TagTree
+    :class: TagTreeHelper
     :options:
       :fields:
       - id

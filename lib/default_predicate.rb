@@ -1,7 +1,7 @@
 # Determines default predicates for machine tags by generating filters (regexs) from rules in config/machine_tags.yml
 # Note: This class doesn't consistently build machine tags with Tag.build_machine_tag()
 class DefaultPredicate
-  CONFIG_FILE = RAILS_ROOT + '/config/machine_tags.yml'
+  CONFIG_FILE = Rails.root + 'config/machine_tags.yml'
 
   attr_accessor :rule, :global, :predicate
   def initialize(rule)
