@@ -1,6 +1,6 @@
 == Description
 
-This is a machine tag based bookmark manager, primarily for console use. Machine tags are
+This is a machine-tag, console bookmark manager which uses Rails3 under the hood. Machine tags are
 implemented using my {has_machine_tags plugin}[http://github.com/cldwalker/has_machine_tags]. To
 use this app you need to know {what machine tags
 are}[http://tagaholic.me/2009/03/26/what-are-machine-tags.html].  This app generates
@@ -11,11 +11,11 @@ more about machine tag trees,
 posts}[http://tagaholic.me/2009/04/26/machine-tagging-with-delicious.html].
 
 == Setup
-  
-  1. Install necessary gems: `rake gems:install`
-  2. Copy config/database.yml.example to config/database.yml and setup your db as needed.
-  3. Run migrations: `rake db:migrate`
-  4. Optionally setup your own commandline aliases at config/alias.yml using config/alias.yml.example as an example.
+  1. Install rails3: `gem install rails --pre`
+  2. Install necessary gems: `bundle install`
+  3. Copy config/database.yml.example to config/database.yml and setup your db as needed.
+  4. Run migrations: `rake db:migrate`
+  5. Optionally setup your own commandline aliases at config/alias.yml using config/alias.yml.example as an example.
 
 == Usage
 
