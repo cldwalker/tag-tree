@@ -2,6 +2,12 @@ source 'http://rubygems.org'
 
 gem 'rails', '3.0.0.rc'
 
+unless ENV['RAILS_ENV'] == 'local'
+  gem 'boson'
+  gem 'has_machine_tags'
+  gem 'console_update'
+end
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 

@@ -4,7 +4,7 @@ module StartRails
   end
 
   def self.after_included
-    Rails.env = 'local' if ENV['RAILS_ENV'] == 'local'
+    ENV['RAILS_ENV'] = 'local' if `git config --get github.user`.chomp == 'cldwalker'
     require File.dirname(__FILE__) + '/../../../config/environment'
   end
 end
