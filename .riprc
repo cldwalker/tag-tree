@@ -1,0 +1,3 @@
+rip-push db
+rip push irb
+rvm gemset use rails3 #rip push rails3
