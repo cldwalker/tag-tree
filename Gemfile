@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.0.0.rc'
+gem 'rails'
 
 unless ENV['RAILS_ENV'] == 'local'
   gem 'boson'

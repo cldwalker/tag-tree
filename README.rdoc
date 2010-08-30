@@ -11,7 +11,7 @@ more about machine tag trees,
 posts}[http://tagaholic.me/2009/04/26/machine-tagging-with-delicious.html].
 
 == Setup
-  1. Install rails3: `gem install rails --pre`
+  1. Install rails3: `gem install rails`
   2. Install necessary gems: `bundle install`
   3. Copy config/database.yml.example to config/database.yml and setup your db as needed.
   4. Run migrations: `rake db:migrate`
