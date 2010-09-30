@@ -1,3 +1,6 @@
+require 'has_machine_tags/tag_console'
+require 'console_update'
+
 class Tag < ActiveRecord::Base
   include HasMachineTags::TagConsole
   #td: doesn't load properly
