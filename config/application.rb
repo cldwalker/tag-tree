@@ -38,5 +38,9 @@ module TagTree
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
+
+    config.before_initialize do
+      require "#{Rails.root}/app/models/tag"
+    end
   end
 end
