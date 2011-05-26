@@ -4,7 +4,6 @@ config/alias.yml
 config/machine_tags.yml
 db/schema.rb
 log
-Gemfile.lock
 vendor/plugins/has_machine_tags
 vendor/plugins/console_update
 vendor/plugins/boson

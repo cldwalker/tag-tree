@@ -1,7 +1,6 @@
 source 'http://rubygems.org'
 
 gem 'rails'
-gem 'mysql'
 
 unless ENV['RAILS_ENV'] == 'local'
   gem 'boson'
