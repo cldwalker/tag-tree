@@ -1,2 +1,6 @@
 require 'ripl/ripper'
 require 'ripl/hirb'
+unless ARGV.include?('-f')
+  require 'boson'
+  Boson.start
+end
