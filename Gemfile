@@ -1,6 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rails'
+gem 'pg'
 
 unless ENV['RAILS_ENV'] == 'local'
   gem 'boson'
