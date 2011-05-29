@@ -1,4 +1,2 @@
-# This file is used by Rack-based servers to start the application.
-
-require ::File.expand_path('../config/environment',  __FILE__)
-run TagTree::Application
+require ::File.expand_path('application')
+run lambda {|e| [200, {'Content-Type' => 'text/html'}, ['hello']] }

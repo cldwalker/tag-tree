@@ -1,6 +1,6 @@
 == Description
 
-This is a machine-tag, console bookmark manager which uses Rails3 under the hood. Machine tags are
+This is a machine-tag, console bookmark manager. Machine tags are
 implemented using my {has_machine_tags plugin}[http://github.com/cldwalker/has_machine_tags]. To
 use this app you need to know {what machine tags
 are}[http://tagaholic.me/2009/03/26/what-are-machine-tags.html].  This app generates
@@ -22,7 +22,7 @@ posts}[http://tagaholic.me/2009/04/26/machine-tagging-with-delicious.html].
 Note: The ascii tables are what you actually see in your console, compliments of
 {the hirb gem}[http://tagaholic.me/hirb/].
 
-  $ rails console
+  $ ripl rack
 
   # list commands that are available in console
   >> commands '-q=l tag_tree'

@@ -28,19 +28,11 @@ GEM
       activemodel (= 3.0.0)
       activesupport (= 3.0.0)
     activesupport (3.0.0)
-    alias (0.2.2)
     arel (1.0.1)
       activesupport (~> 3.0.0)
-    bond (0.4.1)
-    boson (0.3.3)
-      alias (>= 0.2.2)
-      hirb (>= 0.3.5)
     builder (2.1.2)
-    console_update (0.1.5)
     erubis (2.6.6)
       abstract (>= 1.0.0)
-    has_machine_tags (0.1.8)
-    hirb (0.4.5)
     i18n (0.4.1)
     mail (2.2.5)
       activesupport (>= 2.3.6)
@@ -68,12 +60,6 @@ GEM
       rake (>= 0.8.4)
       thor (~> 0.14.0)
     rake (0.8.7)
-    ripl (0.4.1)
-      bond (~> 0.4.0)
-    ripl-rails (0.1.2)
-      ripl (>= 0.3.1)
-    ripl-ripper (0.1.0)
-      ripl (>= 0.3.3)
     thor (0.14.0)
     treetop (1.4.8)
       polyglot (>= 0.3.1)
@@ -83,11 +69,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  boson
-  console_update
-  has_machine_tags
   pg
   rails
-  ripl
-  ripl-rails
-  ripl-ripper

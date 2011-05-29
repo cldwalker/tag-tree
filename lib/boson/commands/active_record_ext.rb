@@ -1,8 +1,8 @@
 module ::ConsoleExtensions
   def self.included(base)
     base.class_eval %[
-      named_scope :find_by_regexp, lambda {|query,fields|
-        conditions = fields.map {|f| "#\{f} REGEXP ?" }.join(" OR ")
+      scope :find_by_regexp, lambda {|query,fields|
+        conditions = fields.map {|f| "#\{f} ~* ?" }.join(" OR ")
         {:conditions=>[conditions, *Array.new(fields.size, query) ]}
       }
 
@@ -24,7 +24,7 @@ end
 
 module ActiveRecordExt
   def self.config
-    {:dependencies=>['start_rails']}
+    {:dependencies=>['start_app']}
   end
 
   def self.after_included
