@@ -11,21 +11,21 @@ more about machine tag trees,
 posts}[http://tagaholic.me/2009/04/26/machine-tagging-with-delicious.html].
 
 == Setup
-  1. Install rails3: `gem install rails`
-  2. Install necessary gems: `bundle install`
-  3. Copy config/database.yml.example to config/database.yml and setup your db as needed.
-  4. Run migrations: `rake db:migrate`
-  5. Optionally setup your own commandline aliases at config/alias.yml using config/alias.yml.example as an example.
+  1. Install postgres. On a mac, `brew install postgresql`.
+  2. Install bundler: `gem install bundler`
+  3. Install all gems: `bundle install`
+  4. Copy config/database.yml.example to config/database.yml and setup your db as needed.
+  5. Run migrations: `rake db:migrate`
 
 == Usage
 
 Note: The ascii tables are what you actually see in your console, compliments of
 {the hirb gem}[http://tagaholic.me/hirb/].
 
-  bash> script/console
+  $ rails console
 
   # list commands that are available in console
-  irb>> commands '-q=l tag_tree'
+  >> commands '-q=l tag_tree'
   +--------------------------+----------------+-------+-----------------------+-----------------------------------------------------------+
   | full_name                | lib            | alias | usage                 | description                                               |
   +--------------------------+----------------+-------+-----------------------+-----------------------------------------------------------+
@@ -51,7 +51,7 @@ Note: The ascii tables are what you actually see in your console, compliments of
   18 rows in set
 
   # Let's create a bookmark/url with machine tags
-  irb>> Url.create :name=>"http://guides.rubyonrails.org/creating_plugins.html", :tag_list =>"article:tags=rails"
+  >> Url.create :name=>"http://guides.rubyonrails.org/creating_plugins.html", :tag_list =>"article:tags=rails"
   +------+------------------------------------------------------+-------------------------+-------------------------------+
   | id   | name                                                 | description             | quick_mode_tag_list           |
   +------+------------------------------------------------------+-------------------------+-------------------------------+
@@ -60,7 +60,7 @@ Note: The ascii tables are what you actually see in your console, compliments of
   1 row in set
 
   # We can retrieve urls with wildcard machine tags. To retrieve our last bookmark 
-  irb>> Url.tagged_with 'article:tags='
+  >> Url.tagged_with 'article:tags='
   +------+------------------------------------------------------+-------------------------+-------------------------------+
   | id   | name                                                 | description             | quick_mode_tag_list           |
   +------+------------------------------------------------------+-------------------------+-------------------------------+
@@ -70,7 +70,7 @@ Note: The ascii tables are what you actually see in your console, compliments of
 
   # Let's generate a tag tree from a wildcard machine tag.
   # This is a tree of my bookmarks under the namespace gem, with values grouped by their count:
-  irb>> tag_tree 'gem: -v g'
+  >> tag_tree 'gem: -v g'
   gem 
     app 
         1: textmate, vim
@@ -102,6 +102,25 @@ Note: The ascii tables are what you actually see in your console, compliments of
     site
         4: ghub, gg
         1: del, freebase
+
+== Heroku
+
+Use heroku to use this console on other computers:
+
+    # From main computer
+    $ heroku create myapp
+    $ git push heroku master
+
+    # Push your local data to heroku
+    $ heroku db:push
+
+    # From another computer, start the console
+    $ heroku console
+    # If on the beta
+    $ heroku run ripl
+
+    # When back at main computer, get your latest bookmarks
+    $ heroku db:pull
 
 == Inputting Machine Tags
 
