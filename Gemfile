@@ -8,6 +8,6 @@ unless ENV['RACK_ENV'] == 'local'
   gem 'has_machine_tags'
   gem 'console_update'
   gem 'ripl'
-  gem 'ripl-rails', :require => 'ripl/rails'
+  gem 'ripl-rack', :require => 'ripl/rack'
   gem 'ripl-ripper', :require => 'ripl/ripper'
 end

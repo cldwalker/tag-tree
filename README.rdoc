@@ -115,9 +115,7 @@ Use heroku to use this console on other computers:
     $ heroku db:push
 
     # From another computer, start the console
-    $ heroku console
-    # If on the beta
-    $ heroku run ripl
+    $ heroku run ripl rack
 
     # When back at main computer, get your latest bookmarks
     $ heroku db:pull
