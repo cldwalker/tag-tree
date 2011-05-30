@@ -5,11 +5,7 @@ $: << "#{APP_ROOT}/lib"
 
 require 'active_record'
 require 'pg'
-# hacks for has_machine_tags
-require 'active_support/core_ext/class/attribute_accessors'
-Rails = Module.new { def self.version() '3.0.0' end }
 require 'has_machine_tags'
-
 require 'console_update'
 require 'boson'
 Dir[APP_ROOT+'/models/*.rb'].each {|e| require e }
