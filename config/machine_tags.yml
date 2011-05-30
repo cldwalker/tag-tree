@@ -1,0 +1,32 @@
+--- 
+:dynamic_predicates: 
+- site:type=*
+- gem:type=*
+- app:type=*
+- plugin:type=*
+:global_predicates: 
+- plang
+- location
+- site
+- os
+- lang
+- app
+- std
+- gem
+- lib
+- person
+- name
+- genre
+- tstd
+- org
+- method
+- class
+- rlib
+- plugin
+- subject
+- mind
+- cs
+- ns
+:predicate_exceptions: 
+  rlib: 
+  - shell

@@ -1,11 +1,4 @@
 .gitignore
 config/database.yml
-config/alias.yml
-config/machine_tags.yml
 db/schema.rb
-log
-vendor/plugins/has_machine_tags
-vendor/plugins/console_update
-vendor/plugins/boson
 lib/boson/config/index.marshal
-tmp/*

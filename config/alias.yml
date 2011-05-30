@@ -1,0 +1,18 @@
+verbose: true
+aliases:
+  constant:
+    Url: U
+    Tag: T
+    DefaultPredicate: D
+    MachineTag: M
+  instance_method:
+    Url:
+      tag_add_and_remove: tar
+      tag_remove_and_save: tr
+      tag_add_and_save: ta
+      tag_and_save: ts
+      tag_list: tl
+  class_method:
+    Url:
+      tagged_with: tw
+      tagged_with_count: twc
