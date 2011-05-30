@@ -13,7 +13,9 @@ require 'has_machine_tags'
 require 'console_update'
 require 'boson'
 Dir[APP_ROOT+'/models/*.rb'].each {|e| require e }
+Dir[APP_ROOT+'/lib/*.rb'].each {|e| require e }
 
 config = YAML.load_file('config/database.yml')[ENV['RACK_ENV']]
 ActiveRecord::Base.establish_connection config
+Alias.create
 Boson.start
