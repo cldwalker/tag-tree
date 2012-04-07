@@ -15,11 +15,19 @@ GEM
     arel (1.0.1)
       activesupport (~> 3.0.0)
     bond (0.4.1)
-    boson (1.2.0)
-    boson-more (0.2.1)
-      boson (>= 1.1.0)
+    boson (1.2.2)
+    boson-more (0.2.2)
+      boson (>= 1.2.0)
     builder (2.1.2)
+    columnize (0.3.6)
     console_update (0.1.5)
+    debugger (1.1.0)
+      columnize (>= 0.3.1)
+      debugger-linecache (~> 1.1)
+      debugger-ruby_core_source (~> 1.1)
+    debugger-linecache (1.1.0)
+      debugger-ruby_core_source
+    debugger-ruby_core_source (1.1.1)
     has_machine_tags (0.2.0)
     hirb (0.6.2)
     i18n (0.4.1)
@@ -46,6 +54,7 @@ DEPENDENCIES
   boson
   boson-more
   console_update
+  debugger
   has_machine_tags
   hirb
   pg

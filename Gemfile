@@ -14,3 +14,5 @@ unless ENV['RACK_ENV'] == 'local'
   gem 'ripl-rack', :require => 'ripl/rack'
   gem 'ripl-ripper', :require => 'ripl/ripper'
 end
+
+gem 'debugger'
