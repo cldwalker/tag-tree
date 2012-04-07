@@ -1,41 +1,41 @@
----
-bin_defaults:
+:bin_defaults:
 - tag_tree_setup
-console_defaults:
+:console_defaults:
 - tag_tree_setup
+# - core_ext
 - tag_tree_core
 - url_finder_commands
 - tag
 - tag_analysis
 - machine_tag_filters
-libraries:
+:libraries:
   machine_tag_filters:
-    class_commands:
+    :class_commands:
       mtag_reset: MachineTagQuery.reset
       mtag_filter: MachineTagQuery.filter
-    commands:
+    :commands:
       mtag_reset:
-        desc: Resets cached machine tag field values
+        :desc: Resets cached machine tag field values
       mtag_filter:
-        desc: Filters machine tag input
+        :desc: Filters machine tag input
   url_finder_commands:
-    dependencies:
+    :dependencies:
     - active_record_ext
   tag:
-    dependencies:
+    :dependencies:
     - active_record_ext
-    class_commands:
+    :class_commands:
       Tag:
       - machine_tags
       - namespaces
       - values
       - predicates
-    commands:
+    :commands:
       machine_tags:
-        args:
+        :args:
         - - mtag
-        option_command: true
-    command_aliases:
+        :option_command: true
+    :command_aliases:
       rename_tags: rt
       tag_find: tf
       search_machine_tag_names: mtrn
@@ -44,35 +44,35 @@ libraries:
       predicates: ps
       values: vs
   tag_tree_core:
-    dependencies:
+    :dependencies:
     - active_record_ext
-    commands:
+    :commands:
       console_find:
-        config:
-          menu:
-            command: browser
-            default_field: name
-        render_options:
-          output_class: Url
-        options:
-          limit: numeric
-          offset: numeric
-          columns:
-            default:
+        :config:
+          :menu:
+            :command: browser
+            :default_field: name
+        :render_options:
+          :output_class: Url
+        :options:
+          :limit: :numeric
+          :offset: :numeric
+          :columns:
+            :default:
             - name
-            values:
+            :values:
             - id
             - name
             - description
             - created_at
             - updated_at
-        args: ! '*'
-        desc: Find urls by ids, range of ids or regex search of fields
-    class_commands:
+        :args: ! '*'
+        :desc: Find urls by ids, range of ids or regex search of fields
+    :class_commands:
       Url:
       - console_find
       - tagged_with_count
-    command_aliases:
+    :command_aliases:
       tagged_with_count: utc
       open_url: ou
       machine_tag_tree: t
@@ -81,7 +81,7 @@ libraries:
       url_tagged_with: ut
       console_find: uf
       console_update: cu
-command_aliases:
+:command_aliases:
   tag_add_and_remove: tar
   tag_remove_and_save: tr
   tag_add_and_save: ta
